@@ -2,10 +2,10 @@ use std::cmp::Ordering;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, Copy)]
-struct Vec3 {
-    x: f64,
-    y: f64,
-    z: f64,
+pub struct Vec3 {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 #[macro_export]
@@ -15,7 +15,9 @@ macro_rules! vec3 {
     };
 }
 
+#[allow(dead_code)]
 type Point3 = Vec3;
+#[allow(dead_code)]
 type Color = Vec3;
 
 impl Vec3 {
@@ -68,6 +70,18 @@ impl Add<f64> for Vec3 {
     }
 }
 
+impl Add<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn add(self, rhs: Vec3) -> Self::Output {
+        Vec3 {
+            x: self + rhs.x,
+            y: self + rhs.y,
+            z: self + rhs.z,
+        }
+    }
+}
+
 impl Sub<Vec3> for Vec3 {
     type Output = Vec3;
 
@@ -88,6 +102,18 @@ impl Sub<f64> for Vec3 {
             x: self.x - rhs,
             y: self.y - rhs,
             z: self.z - rhs,
+        }
+    }
+}
+
+impl Sub<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn sub(self, rhs: Vec3) -> Self::Output {
+        Vec3 {
+            x: self - rhs.x,
+            y: self - rhs.y,
+            z: self - rhs.z,
         }
     }
 }
@@ -184,7 +210,20 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_add_vec3() {
+    fn test_neg_vec3() {
+        let test_cases = vec![
+            (vec3!(1, 2, 3), vec3!(-1, -2, -3)),
+            (vec3!(-1, -2, -3), vec3!(1, 2, 3)),
+        ];
+
+        for (val, expected) in test_cases {
+            let result = -val;
+            assert_eq!(result, expected, "Failed for input: '{:?}", val);
+        }
+    }
+
+    #[test]
+    fn test_add_vec3_vec3() {
         let test_cases = vec![
             (vec3!(1, 2, 3), vec3!(4, 5, 6), vec3!(5, 7, 9)),
             (vec3!(-1, -2, -3), vec3!(1, 2, 3), vec3!(0, 0, 0)),
@@ -192,12 +231,12 @@ mod tests {
 
         for (lhs, rhs, expected) in test_cases {
             let result = lhs + rhs;
-            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs),);
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
         }
     }
 
     #[test]
-    fn test_add_f64() {
+    fn test_add_vec3_f64() {
         let test_cases = vec![
             (vec3!(1, 2, 3), 1.0, vec3!(2, 3, 4)),
             (vec3!(-1, -2, -3), 1.0, vec3!(0, -1, -2)),
@@ -205,12 +244,25 @@ mod tests {
 
         for (lhs, rhs, expected) in test_cases {
             let result = lhs + rhs;
-            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs),);
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
         }
     }
 
     #[test]
-    fn test_sub_vec3() {
+    fn test_add_f64_vec3() {
+        let test_cases = vec![
+            (1.0, vec3!(1, 2, 3), vec3!(2, 3, 4)),
+            (1.0, vec3!(-1, -2, -3), vec3!(0, -1, -2)),
+        ];
+
+        for (lhs, rhs, expected) in test_cases {
+            let result = lhs + rhs;
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
+        }
+    }
+
+    #[test]
+    fn test_sub_vec3_vec3() {
         // (lhs, rhs, expected)
         let test_cases = vec![
             (vec3!(1, 2, 3), vec3!(4, 5, 6), vec3!(-3, -3, -3)),
@@ -219,12 +271,12 @@ mod tests {
 
         for (lhs, rhs, expected) in test_cases {
             let result = lhs - rhs;
-            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs),);
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
         }
     }
 
     #[test]
-    fn test_sub_f64() {
+    fn test_sub_vec3_f64() {
         let test_cases = vec![
             (vec3!(1, 2, 3), 1.0, vec3!(0, 1, 2)),
             (vec3!(-1, -2, -3), 1.0, vec3!(-2, -3, -4)),
@@ -232,7 +284,20 @@ mod tests {
 
         for (lhs, rhs, expected) in test_cases {
             let result = lhs - rhs;
-            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs),);
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
+        }
+    }
+
+    #[test]
+    fn test_sub_f64_vec3() {
+        let test_cases = vec![
+            (1.0, vec3!(1, 2, 3), vec3!(0, -1, -2)),
+            (1.0, vec3!(-1, -2, -3), vec3!(2, 3, 4)),
+        ];
+
+        for (lhs, rhs, expected) in test_cases {
+            let result = lhs - rhs;
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
         }
     }
 
@@ -245,7 +310,7 @@ mod tests {
 
         for (lhs, rhs, expected) in test_cases {
             let result = lhs * rhs;
-            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs),);
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
         }
     }
 
@@ -258,7 +323,7 @@ mod tests {
 
         for (lhs, rhs, expected) in test_cases {
             let result = lhs * rhs;
-            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs),);
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
         }
     }
 
@@ -271,7 +336,7 @@ mod tests {
 
         for (lhs, rhs, expected) in test_cases {
             let result = lhs * rhs;
-            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs),);
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
         }
     }
 }
