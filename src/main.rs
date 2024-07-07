@@ -1,3 +1,7 @@
+mod vec3;
+
+use vec3::Vec3;
+
 fn main() {
     let image_width = 256;
     let image_height = 256;
@@ -18,4 +22,9 @@ fn main() {
         }
     }
     eprintln!("\nDone");
+
+    let v1 = vec3!(1, 2, 3);
+    // let v2 = vec3!(1, 2, 3);
+
+    println!("{:?}", -v1);
 }
