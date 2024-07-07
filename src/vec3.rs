@@ -8,6 +8,11 @@ pub struct Vec3 {
     pub z: f64,
 }
 
+#[allow(dead_code)]
+pub type Point3 = Vec3;
+#[allow(dead_code)]
+pub type Color = Vec3;
+
 #[macro_export]
 macro_rules! vec3 {
     ($x:expr, $y:expr, $z:expr) => {
@@ -15,10 +20,19 @@ macro_rules! vec3 {
     };
 }
 
-#[allow(dead_code)]
-type Point3 = Vec3;
-#[allow(dead_code)]
-type Color = Vec3;
+#[macro_export]
+macro_rules! color {
+    ($x:expr, $y:expr, $z:expr) => {
+        Color::new($x as f64, $y as f64, $z as f64)
+    };
+}
+
+#[macro_export]
+macro_rules! point {
+    ($x:expr, $y:expr, $z:expr) => {
+        Point::new($x as f64, $y as f64, $z as f64)
+    };
+}
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
