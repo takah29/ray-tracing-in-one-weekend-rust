@@ -227,11 +227,42 @@ impl DivAssign<f64> for Vec3 {
     }
 }
 
+// ========== PartialEq ==========
+
+// 数値計算の誤差で完全一致しない場合があるのでEPSILONの統合を許す
 impl PartialEq for Vec3 {
     fn eq(&self, other: &Self) -> bool {
         (self.x - other.x).abs() < f64::EPSILON
             && (self.y - other.y).abs() < f64::EPSILON
             && (self.z - other.z).abs() < f64::EPSILON
+    }
+}
+
+// ========== PartialOrd ==========
+
+impl PartialOrd for Vec3 {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        let cmp_x = self.x.partial_cmp(&other.x);
+        let cmp_y = self.y.partial_cmp(&other.y);
+        let cmp_z = self.z.partial_cmp(&other.z);
+        if cmp_x == Some(Ordering::Less)
+            && cmp_y == Some(Ordering::Less)
+            && cmp_z == Some(Ordering::Less)
+        {
+            Some(Ordering::Less)
+        } else if cmp_x == Some(Ordering::Greater)
+            && cmp_y == Some(Ordering::Greater)
+            && cmp_z == Some(Ordering::Greater)
+        {
+            Some(Ordering::Greater)
+        } else if cmp_x == Some(Ordering::Equal)
+            && cmp_y == Some(Ordering::Equal)
+            && cmp_z == Some(Ordering::Equal)
+        {
+            Some(Ordering::Equal)
+        } else {
+            None
+        }
     }
 }
 
@@ -299,7 +330,6 @@ mod tests {
 
     #[test]
     fn test_sub_vec3_vec3() {
-        // (lhs, rhs, expected)
         let test_cases = vec![
             (vec3!(1, 2, 3), vec3!(4, 5, 6), vec3!(-3, -3, -3)),
             (vec3!(-1, -2, -3), vec3!(1, 2, 3), vec3!(-2, -4, -6)),
@@ -382,7 +412,6 @@ mod tests {
 
     #[test]
     fn test_div_vec3_f64() {
-        // (lhs, rhs, expected)
         let test_cases = vec![
             (vec3!(1, 2, 3), 2.0, vec3!(0.5, 1.0, 1.5)),
             (vec3!(-1, -2, -3), 2.0, vec3!(-0.5, -1.0, -1.5)),
@@ -438,7 +467,6 @@ mod tests {
 
     #[test]
     fn test_sub_assign_vec3_vec3() {
-        // (lhs, rhs, expected)
         let test_cases = vec![
             (vec3!(1, 2, 3), vec3!(4, 5, 6), vec3!(-3, -3, -3)),
             (vec3!(-1, -2, -3), vec3!(1, 2, 3), vec3!(-2, -4, -6)),
@@ -500,7 +528,6 @@ mod tests {
 
     #[test]
     fn test_div_assing_vec3_f64() {
-        // (lhs, rhs, expected)
         let test_cases = vec![
             (vec3!(1, 2, 3), 2.0, vec3!(0.5, 1.0, 1.5)),
             (vec3!(-1, -2, -3), 2.0, vec3!(-0.5, -1.0, -1.5)),
@@ -515,6 +542,98 @@ mod tests {
                 "Failed for input: '{:?}",
                 (original_lhs, rhs)
             );
+        }
+    }
+
+    // ========== PartialEq ==========
+
+    #[test]
+    fn test_partial_eq() {
+        let test_cases = vec![
+            (vec3!(1, 2, 3), vec3!(1, 2, 3), true),
+            (vec3!(1, 2, 3), vec3!(1, 2, 4), false),
+        ];
+
+        for (lhs, rhs, expected) in test_cases {
+            let result = lhs == rhs;
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
+        }
+    }
+
+    // ========== PartialOrd ==========
+
+    #[test]
+    fn test_partial_cmp() {
+        let test_cases = vec![
+            (vec3!(1, 2, 3), vec3!(2, 3, 4), Some(Ordering::Less)),
+            (vec3!(1, 2, 3), vec3!(0, 1, 2), Some(Ordering::Greater)),
+            (vec3!(1, 2, 3), vec3!(1, 2, 3), Some(Ordering::Equal)),
+            (vec3!(1, 2, 3), vec3!(1, 3, 2), None),
+        ];
+
+        for (lhs, rhs, expected) in test_cases {
+            let result = lhs.partial_cmp(&rhs);
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
+        }
+    }
+
+    #[test]
+    fn test_less_than() {
+        let test_cases = vec![
+            (vec3!(1, 2, 3), vec3!(2, 3, 4), true),
+            (vec3!(1, 2, 3), vec3!(0, 1, 2), false),
+            (vec3!(1, 2, 3), vec3!(1, 2, 3), false),
+            (vec3!(1, 2, 3), vec3!(1, 3, 2), false),
+        ];
+
+        for (lhs, rhs, expected) in test_cases {
+            let result = lhs < rhs;
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
+        }
+    }
+
+    #[test]
+    fn test_less_eq() {
+        let test_cases = vec![
+            (vec3!(1, 2, 3), vec3!(2, 3, 4), true),
+            (vec3!(1, 2, 3), vec3!(0, 1, 2), false),
+            (vec3!(1, 2, 3), vec3!(1, 2, 3), true),
+            (vec3!(1, 2, 3), vec3!(1, 3, 2), false),
+        ];
+
+        for (lhs, rhs, expected) in test_cases {
+            let result = lhs <= rhs;
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
+        }
+    }
+
+    #[test]
+    fn test_greater_than() {
+        let test_cases = vec![
+            (vec3!(2, 3, 4), vec3!(1, 2, 3), true),
+            (vec3!(0, 1, 2), vec3!(1, 2, 3), false),
+            (vec3!(1, 2, 3), vec3!(1, 2, 3), false),
+            (vec3!(1, 3, 2), vec3!(1, 2, 3), false),
+        ];
+
+        for (lhs, rhs, expected) in test_cases {
+            let result = lhs > rhs;
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
+        }
+    }
+
+    #[test]
+    fn test_greater_eq() {
+        let test_cases = vec![
+            (vec3!(2, 3, 4), vec3!(1, 2, 3), true),
+            (vec3!(0, 1, 2), vec3!(1, 2, 3), false),
+            (vec3!(1, 2, 3), vec3!(1, 2, 3), true),
+            (vec3!(1, 3, 2), vec3!(1, 2, 3), false),
+        ];
+
+        for (lhs, rhs, expected) in test_cases {
+            let result = lhs >= rhs;
+            assert_eq!(result, expected, "Failed for input: '{:?}", (lhs, rhs));
         }
     }
 }
