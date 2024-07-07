@@ -32,6 +32,30 @@ impl Vec3 {
             z: 0.0,
         }
     }
+
+    pub fn length_squared(self) -> f64 {
+        self.x * self.x + self.y * self.y + self.z * self.z
+    }
+
+    pub fn length(self) -> f64 {
+        self.length_squared().sqrt()
+    }
+
+    pub fn dot(self, other: Self) -> f64 {
+        self * other
+    }
+
+    pub fn cross(self, other: Self) -> Self {
+        Self {
+            x: self.y * other.z - self.z * other.y,
+            y: self.z * other.x - self.x * other.z,
+            z: self.x * other.y - self.y * other.x,
+        }
+    }
+
+    pub fn unit(self) -> Self {
+        self / self.length()
+    }
 }
 
 // ========== Neg ==========
@@ -269,6 +293,56 @@ impl PartialOrd for Vec3 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_length_squared() {
+        let test_cases = vec![(vec3!(1, 2, 3), 14.0), (vec3!(-1, -2, -3), 14.0)];
+
+        for (val, expected) in test_cases {
+            let result = val.length_squared();
+            assert_eq!(result, expected, "Failed for input: '{:?}", val);
+        }
+    }
+
+    #[test]
+    fn test_length() {
+        let test_cases = vec![(vec3!(2, 0, 0), 2.0), (vec3!(0, -2, 0), 2.0)];
+
+        for (val, expected) in test_cases {
+            let result = val.length();
+            assert_eq!(result, expected, "Failed for input: '{:?}", val);
+        }
+    }
+
+    #[test]
+    fn test_cross() {
+        let test_cases = vec![
+            (vec3!(1, 0, 0), vec3!(0, 1, 0), vec3!(0, 0, 1)),
+            (vec3!(1, 0, 0), vec3!(0, 0, 1), vec3!(0, -1, 0)),
+            (vec3!(0, 1, 0), vec3!(0, 0, 1), vec3!(1, 0, 0)),
+        ];
+
+        for (val, other, expected) in test_cases {
+            let result = val.cross(other);
+            assert_eq!(result, expected, "Failed for input: '{:?}", (val, other));
+        }
+    }
+
+    #[test]
+    fn test_unit() {
+        let test_cases = vec![
+            (vec3!(1, 0, 0), 1.0),
+            (vec3!(0, 1, 0), 1.0),
+            (vec3!(0, 0, 1), 1.0),
+            (vec3!(1, 1, 1), 1.0),
+            (vec3!(100, 100, 100), 1.0),
+        ];
+
+        for (val, expected) in test_cases {
+            let result = val.unit().length();
+            assert_eq!(result, expected, "Failed for input: '{:?}", val);
+        }
+    }
 
     // ========== Neg ==========
 
