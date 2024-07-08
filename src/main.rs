@@ -9,13 +9,13 @@ use vec3::{Color, Point3, Vec3};
 fn hit_sphere(center: Point3, radius: f64, r: Ray) -> f64 {
     let oc = r.orig - center;
     let a = r.dir.length_squared();
-    let b = 2.0 * oc * r.dir;
+    let half_b = oc * r.dir;
     let c = oc.length_squared() - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
+    let discriminant = half_b * half_b - a * c;
     if discriminant < 0.0 {
         return -1.0;
     } else {
-        return (-b - discriminant.sqrt()) / (2.0 * a);
+        return (-half_b - discriminant.sqrt()) / a;
     }
 }
 
