@@ -28,9 +28,9 @@ macro_rules! color {
 }
 
 #[macro_export]
-macro_rules! point {
+macro_rules! point3 {
     ($x:expr, $y:expr, $z:expr) => {
-        Point::new($x as f64, $y as f64, $z as f64)
+        Point3::new($x as f64, $y as f64, $z as f64)
     };
 }
 
