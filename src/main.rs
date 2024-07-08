@@ -1,6 +1,7 @@
 mod hittable;
 mod hittable_list;
 mod ray;
+mod rtweekend;
 mod sphere;
 mod utils;
 mod vec3;
