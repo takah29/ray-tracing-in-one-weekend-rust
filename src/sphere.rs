@@ -24,18 +24,24 @@ impl Hittable for Sphere {
         if discriminant > 0.0 {
             let root = discriminant.sqrt();
             let temp = (-half_b - root) / a;
+
+            // 値が小さい方のt
             if t_min < temp && temp < t_max {
                 rec.t = temp;
                 rec.p = r.clone().at(rec.t);
-                rec.normal = (rec.p - self.center) / self.radius;
+                let outward_normal = (rec.p - self.center) / self.radius;
+                rec.set_face_normal(r, &outward_normal);
                 return true;
             }
 
             let temp = (-half_b + root) / a;
+
+            // 値が大きい方のt
             if t_min < temp && temp < t_max {
                 rec.t = temp;
                 rec.p = r.clone().at(rec.t);
-                rec.normal = (rec.p - self.center) / self.radius;
+                let outward_normal = (rec.p - self.center) / self.radius;
+                rec.set_face_normal(r, &outward_normal);
                 return true;
             }
         }
