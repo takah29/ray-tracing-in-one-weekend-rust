@@ -15,7 +15,7 @@ mod tests {
 
         for (input, expected) in test_cases {
             let result = degrees_to_radians(input);
-            assert_eq!(result, expected, "Failed for input: '{:?}", input);
+            assert_eq!(result, expected, "Failed for input: '{}", input);
         }
     }
 }

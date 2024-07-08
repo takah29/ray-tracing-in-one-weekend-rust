@@ -1,28 +1,18 @@
 use ray_tracing_in_one_weekend::{
+    hittable::{HitRecord, Hittable},
+    hittable_list::HittableList,
     ray::Ray,
+    rtweekend::INFINITY,
+    sphere::Sphere,
     utils::write_color,
     vec3::{Color, Point3, Vec3},
     {color, point3, vec3},
 };
 
-fn hit_sphere(center: Point3, radius: f64, r: Ray) -> f64 {
-    let oc = r.orig - center;
-    let a = r.dir.length_squared();
-    let half_b = oc * r.dir;
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = half_b * half_b - a * c;
-    if discriminant < 0.0 {
-        return -1.0;
-    } else {
-        return (-half_b - discriminant.sqrt()) / a;
-    }
-}
-
-fn ray_color(r: Ray) -> Color {
-    let t = hit_sphere(point3!(0, 0, -1), 0.5, r.clone());
-    if t > 0.0 {
-        let normal = (r.at(t) - vec3!(0, 0, -1)).unit();
-        return 0.5 * color!(normal.x + 1.0, normal.y + 1.0, normal.z + 1.0);
+fn ray_color(r: Ray, world: &HittableList) -> Color {
+    let mut rec = HitRecord::default();
+    if world.hit(&r, 0.0, INFINITY, &mut rec) {
+        return 0.5 * (rec.normal + color!(1, 1, 1));
     }
 
     let unit_direction = r.dir.unit();
@@ -46,6 +36,10 @@ fn main() {
     let vertical = vec3!(0, viewport_height, 0);
     let lower_left_corner = origin - horizontal / 2.0 - vertical / 2.0 - vec3!(0, 0, focal_length);
 
+    let mut world = HittableList::new();
+    world.add(Box::new(Sphere::new(point3!(0, 0, -1), 0.5)));
+    world.add(Box::new(Sphere::new(point3!(0, -100.5, -1), 100.0)));
+
     for j in (0..image_height).rev() {
         eprint!("\rScanline remaining: {:3}", j);
         for i in 0..image_width {
@@ -55,7 +49,7 @@ fn main() {
                 origin,
                 lower_left_corner + u * horizontal + v * vertical - origin,
             );
-            let pixel_color = ray_color(r);
+            let pixel_color = ray_color(r, &world);
             write_color(pixel_color);
         }
     }
