@@ -6,19 +6,26 @@ use ray::Ray;
 use utils::write_color;
 use vec3::{Color, Point3, Vec3};
 
-fn hit_sphere(center: Point3, radius: f64, r: Ray) -> bool {
+fn hit_sphere(center: Point3, radius: f64, r: Ray) -> f64 {
     let oc = r.orig - center;
     let a = r.dir.length_squared();
     let b = 2.0 * oc * r.dir;
     let c = oc.length_squared() - radius * radius;
     let discriminant = b * b - 4.0 * a * c;
-    discriminant > 0.0
+    if discriminant < 0.0 {
+        return -1.0;
+    } else {
+        return (-b - discriminant.sqrt()) / (2.0 * a);
+    }
 }
 
 fn ray_color(r: Ray) -> Color {
-    if hit_sphere(point3!(0, 0, -1), 0.5, r.clone()) {
-        return color!(1, 0, 0);
+    let t = hit_sphere(point3!(0, 0, -1), 0.5, r.clone());
+    if t > 0.0 {
+        let normal = (r.at(t) - vec3!(0, 0, -1)).unit();
+        return 0.5 * color!(normal.x + 1.0, normal.y + 1.0, normal.z + 1.0);
     }
+
     let unit_direction = r.dir.unit();
     let t = 0.5 * (unit_direction.y + 1.0);
     (1.0 - t) * color!(1, 1, 1) + t * color!(0.5, 0.7, 1.0)
