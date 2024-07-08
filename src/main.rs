@@ -1,14 +1,9 @@
-mod hittable;
-mod hittable_list;
-mod ray;
-mod rtweekend;
-mod sphere;
-mod utils;
-mod vec3;
-
-use ray::Ray;
-use utils::write_color;
-use vec3::{Color, Point3, Vec3};
+use ray_tracing_in_one_weekend::{
+    ray::Ray,
+    utils::write_color,
+    vec3::{Color, Point3, Vec3},
+    {color, point3, vec3},
+};
 
 fn hit_sphere(center: Point3, radius: f64, r: Ray) -> f64 {
     let oc = r.orig - center;
