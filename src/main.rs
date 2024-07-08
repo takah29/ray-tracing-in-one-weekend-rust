@@ -1,5 +1,6 @@
 mod hittable;
 mod ray;
+mod sphere;
 mod utils;
 mod vec3;
 
