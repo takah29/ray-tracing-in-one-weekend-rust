@@ -1,4 +1,4 @@
-use crate::rtweekend::{random, random_range};
+use crate::rtweekend::{random, random_range, PI};
 use std::cmp::Ordering;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
@@ -40,6 +40,13 @@ pub fn random_in_unit_sphere() -> Vec3 {
             return p;
         }
     }
+}
+
+pub fn random_unit_vector() -> Vec3 {
+    let a = random_range(0.0, 2.0 * PI);
+    let z = random_range(-1.0, 1.0);
+    let r = (1.0 - z * z).sqrt();
+    return vec3!(r * a.cos(), r * a.sin(), z);
 }
 
 impl Vec3 {
