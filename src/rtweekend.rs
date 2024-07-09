@@ -1,3 +1,5 @@
+pub use crate::ray::Ray;
+pub use crate::vec3::{Color, Point3, Vec3};
 use rand::Rng;
 use std::cell::RefCell;
 pub use std::f64::consts::PI;

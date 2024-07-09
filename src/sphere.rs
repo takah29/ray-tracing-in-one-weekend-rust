@@ -1,6 +1,5 @@
 use crate::hittable::{HitRecord, Hittable};
-use crate::ray::Ray;
-use crate::vec3::Point3;
+use crate::rtweekend::{Point3, Ray};
 
 pub struct Sphere {
     pub center: Point3,

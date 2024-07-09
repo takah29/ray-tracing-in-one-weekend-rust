@@ -1,5 +1,4 @@
-use crate::ray::Ray;
-use crate::vec3::{Point3, Vec3};
+use crate::rtweekend::{Point3, Ray, Vec3};
 
 #[derive(Default, Clone)]
 pub struct HitRecord {
