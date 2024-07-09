@@ -1,8 +1,22 @@
+use rand::Rng;
+use std::cell::RefCell;
 pub use std::f64::consts::PI;
 pub use std::f64::INFINITY;
 
+thread_local! {
+    static RNG: RefCell<rand::rngs::ThreadRng> = RefCell::new(rand::thread_rng());
+}
+
 pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0
+}
+
+pub fn random() -> f64 {
+    RNG.with(|rng| rng.borrow_mut().gen())
+}
+
+pub fn random_range(min: f64, max: f64) -> f64 {
+    RNG.with(|rng| rng.borrow_mut().gen_range(min..max))
 }
 
 #[cfg(test)]
