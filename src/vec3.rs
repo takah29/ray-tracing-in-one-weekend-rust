@@ -49,6 +49,15 @@ pub fn random_unit_vector() -> Vec3 {
     return vec3!(r * a.cos(), r * a.sin(), z);
 }
 
+pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
+    let in_unit_sphere = random_in_unit_sphere();
+    if in_unit_sphere * normal > 0.0 {
+        return in_unit_sphere;
+    } else {
+        return -in_unit_sphere;
+    }
+}
+
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { e: [x, y, z] }

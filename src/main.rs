@@ -8,7 +8,7 @@ use ray_tracing_in_one_weekend::{
     rtweekend::{random, Color, Point3, INFINITY},
     sphere::Sphere,
     utils::write_color,
-    vec3::random_unit_vector,
+    vec3::random_in_hemisphere,
 };
 
 fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
@@ -19,7 +19,7 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
     }
 
     if world.hit(&r, 0.001, INFINITY, &mut rec) {
-        let target = rec.p + rec.normal + random_unit_vector();
+        let target = rec.p + random_in_hemisphere(rec.normal);
         return 0.5 * ray_color(Ray::new(rec.p, target - rec.p), world, depth - 1);
     }
 
