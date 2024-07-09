@@ -1,3 +1,4 @@
+use crate::rtweekend::{random, random_range};
 use std::cmp::Ordering;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
@@ -32,6 +33,15 @@ macro_rules! point3 {
     };
 }
 
+pub fn random_in_unit_sphere() -> Vec3 {
+    loop {
+        let p = Vec3::random_range(-1.0, 1.0);
+        if p.length_squared() < 1.0 {
+            return p;
+        }
+    }
+}
+
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { e: [x, y, z] }
@@ -39,6 +49,22 @@ impl Vec3 {
 
     pub fn origin() -> Self {
         Self { e: [0.0, 0.0, 0.0] }
+    }
+
+    pub fn random() -> Self {
+        Self {
+            e: [random(), random(), random()],
+        }
+    }
+
+    pub fn random_range(min: f64, max: f64) -> Self {
+        Self {
+            e: [
+                random_range(min, max),
+                random_range(min, max),
+                random_range(min, max),
+            ],
+        }
     }
 
     pub fn length_squared(self) -> f64 {

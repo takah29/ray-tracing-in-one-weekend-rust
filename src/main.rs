@@ -8,12 +8,14 @@ use ray_tracing_in_one_weekend::{
     rtweekend::{random, Color, Point3, INFINITY},
     sphere::Sphere,
     utils::write_color,
+    vec3::random_in_unit_sphere,
 };
 
 fn ray_color(r: Ray, world: &HittableList) -> Color {
     let mut rec = HitRecord::default();
     if world.hit(&r, 0.0, INFINITY, &mut rec) {
-        return 0.5 * (rec.normal + color!(1, 1, 1));
+        let target = rec.p + rec.normal + random_in_unit_sphere();
+        return 0.5 * ray_color(Ray::new(rec.p, target - rec.p), world);
     }
 
     let unit_direction = r.dir.unit();
