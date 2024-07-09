@@ -3,9 +3,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Vec3 {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
+    pub e: [f64; 3],
 }
 
 #[allow(dead_code)]
@@ -36,19 +34,15 @@ macro_rules! point3 {
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Vec3 { x, y, z }
+        Self { e: [x, y, z] }
     }
 
     pub fn origin() -> Self {
-        Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        }
+        Self { e: [0.0, 0.0, 0.0] }
     }
 
     pub fn length_squared(self) -> f64 {
-        self.x * self.x + self.y * self.y + self.z * self.z
+        self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
     }
 
     pub fn length(self) -> f64 {
@@ -61,9 +55,11 @@ impl Vec3 {
 
     pub fn cross(self, other: Self) -> Self {
         Self {
-            x: self.y * other.z - self.z * other.y,
-            y: self.z * other.x - self.x * other.z,
-            z: self.x * other.y - self.y * other.x,
+            e: [
+                self.e[1] * other.e[2] - self.e[2] * other.e[1],
+                self.e[2] * other.e[0] - self.e[0] * other.e[2],
+                self.e[0] * other.e[1] - self.e[1] * other.e[0],
+            ],
         }
     }
 
@@ -79,9 +75,7 @@ impl Neg for Vec3 {
 
     fn neg(self) -> Self::Output {
         Self {
-            x: -self.x,
-            y: -self.y,
-            z: -self.z,
+            e: [-self.e[0], -self.e[1], -self.e[2]],
         }
     }
 }
@@ -93,9 +87,11 @@ impl Add<Vec3> for Vec3 {
 
     fn add(self, rhs: Self) -> Self::Output {
         Self {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-            z: self.z + rhs.z,
+            e: [
+                self.e[0] + rhs.e[0],
+                self.e[1] + rhs.e[1],
+                self.e[2] + rhs.e[2],
+            ],
         }
     }
 }
@@ -105,9 +101,7 @@ impl Add<f64> for Vec3 {
 
     fn add(self, rhs: f64) -> Self::Output {
         Self {
-            x: self.x + rhs,
-            y: self.y + rhs,
-            z: self.z + rhs,
+            e: [self.e[0] + rhs, self.e[1] + rhs, self.e[2] + rhs],
         }
     }
 }
@@ -117,9 +111,7 @@ impl Add<Vec3> for f64 {
 
     fn add(self, rhs: Vec3) -> Self::Output {
         Vec3 {
-            x: self + rhs.x,
-            y: self + rhs.y,
-            z: self + rhs.z,
+            e: [self + rhs.e[0], self + rhs.e[1], self + rhs.e[2]],
         }
     }
 }
@@ -131,9 +123,11 @@ impl Sub<Vec3> for Vec3 {
 
     fn sub(self, rhs: Self) -> Self::Output {
         Self {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-            z: self.z - rhs.z,
+            e: [
+                self.e[0] - rhs.e[0],
+                self.e[1] - rhs.e[1],
+                self.e[2] - rhs.e[2],
+            ],
         }
     }
 }
@@ -143,9 +137,7 @@ impl Sub<f64> for Vec3 {
 
     fn sub(self, rhs: f64) -> Self::Output {
         Self {
-            x: self.x - rhs,
-            y: self.y - rhs,
-            z: self.z - rhs,
+            e: [self.e[0] - rhs, self.e[1] - rhs, self.e[2] - rhs],
         }
     }
 }
@@ -155,9 +147,7 @@ impl Sub<Vec3> for f64 {
 
     fn sub(self, rhs: Vec3) -> Self::Output {
         Vec3 {
-            x: self - rhs.x,
-            y: self - rhs.y,
-            z: self - rhs.z,
+            e: [self - rhs.e[0], self - rhs.e[1], self - rhs.e[2]],
         }
     }
 }
@@ -169,9 +159,7 @@ impl Mul<f64> for Vec3 {
 
     fn mul(self, rhs: f64) -> Self::Output {
         Self {
-            x: self.x * rhs,
-            y: self.y * rhs,
-            z: self.z * rhs,
+            e: [self.e[0] * rhs, self.e[1] * rhs, self.e[2] * rhs],
         }
     }
 }
@@ -181,9 +169,7 @@ impl Mul<Vec3> for f64 {
 
     fn mul(self, rhs: Vec3) -> Self::Output {
         Vec3 {
-            x: self * rhs.x,
-            y: self * rhs.y,
-            z: self * rhs.z,
+            e: [self * rhs.e[0], self * rhs.e[1], self * rhs.e[2]],
         }
     }
 }
@@ -193,7 +179,7 @@ impl Mul<Vec3> for Vec3 {
     type Output = f64;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+        self.e[0] * rhs.e[0] + self.e[1] * rhs.e[1] + self.e[2] * rhs.e[2]
     }
 }
 
@@ -204,9 +190,7 @@ impl Div<f64> for Vec3 {
 
     fn div(self, rhs: f64) -> Self::Output {
         Self {
-            x: self.x / rhs,
-            y: self.y / rhs,
-            z: self.z / rhs,
+            e: [self.e[0] / rhs, self.e[1] / rhs, self.e[2] / rhs],
         }
     }
 }
@@ -215,17 +199,17 @@ impl Div<f64> for Vec3 {
 
 impl AddAssign<Vec3> for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
-        self.x += rhs.x;
-        self.y += rhs.y;
-        self.z += rhs.z;
+        self.e[0] += rhs.e[0];
+        self.e[1] += rhs.e[1];
+        self.e[2] += rhs.e[2];
     }
 }
 
 impl AddAssign<f64> for Vec3 {
     fn add_assign(&mut self, rhs: f64) {
-        self.x += rhs;
-        self.y += rhs;
-        self.z += rhs;
+        self.e[0] += rhs;
+        self.e[1] += rhs;
+        self.e[2] += rhs;
     }
 }
 
@@ -233,17 +217,17 @@ impl AddAssign<f64> for Vec3 {
 
 impl SubAssign<Vec3> for Vec3 {
     fn sub_assign(&mut self, rhs: Self) {
-        self.x -= rhs.x;
-        self.y -= rhs.y;
-        self.z -= rhs.z;
+        self.e[0] -= rhs.e[0];
+        self.e[1] -= rhs.e[1];
+        self.e[2] -= rhs.e[2];
     }
 }
 
 impl SubAssign<f64> for Vec3 {
     fn sub_assign(&mut self, rhs: f64) {
-        self.x -= rhs;
-        self.y -= rhs;
-        self.z -= rhs;
+        self.e[0] -= rhs;
+        self.e[1] -= rhs;
+        self.e[2] -= rhs;
     }
 }
 
@@ -251,9 +235,9 @@ impl SubAssign<f64> for Vec3 {
 
 impl MulAssign<f64> for Vec3 {
     fn mul_assign(&mut self, rhs: f64) {
-        self.x *= rhs;
-        self.y *= rhs;
-        self.z *= rhs;
+        self.e[0] *= rhs;
+        self.e[1] *= rhs;
+        self.e[2] *= rhs;
     }
 }
 
@@ -270,9 +254,9 @@ impl DivAssign<f64> for Vec3 {
 // 数値計算の誤差で完全一致しない場合があるのでEPSILONの統合を許す
 impl PartialEq for Vec3 {
     fn eq(&self, other: &Self) -> bool {
-        (self.x - other.x).abs() < f64::EPSILON
-            && (self.y - other.y).abs() < f64::EPSILON
-            && (self.z - other.z).abs() < f64::EPSILON
+        (self.e[0] - other.e[0]).abs() < f64::EPSILON
+            && (self.e[1] - other.e[1]).abs() < f64::EPSILON
+            && (self.e[2] - other.e[2]).abs() < f64::EPSILON
     }
 }
 
@@ -280,9 +264,9 @@ impl PartialEq for Vec3 {
 
 impl PartialOrd for Vec3 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        let cmp_x = self.x.partial_cmp(&other.x);
-        let cmp_y = self.y.partial_cmp(&other.y);
-        let cmp_z = self.z.partial_cmp(&other.z);
+        let cmp_x = self.e[0].partial_cmp(&other.e[0]);
+        let cmp_y = self.e[1].partial_cmp(&other.e[1]);
+        let cmp_z = self.e[2].partial_cmp(&other.e[2]);
         if cmp_x == Some(Ordering::Less)
             && cmp_y == Some(Ordering::Less)
             && cmp_z == Some(Ordering::Less)
