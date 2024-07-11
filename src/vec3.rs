@@ -7,9 +7,7 @@ pub struct Vec3 {
     pub e: [f64; 3],
 }
 
-#[allow(dead_code)]
 pub type Point3 = Vec3;
-#[allow(dead_code)]
 pub type Color = Vec3;
 
 #[macro_export]
