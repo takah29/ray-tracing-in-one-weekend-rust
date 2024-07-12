@@ -56,6 +56,10 @@ pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
     }
 }
 
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+    *v - 2.0 * v.dot(*n) * (*n)
+}
+
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { e: [x, y, z] }

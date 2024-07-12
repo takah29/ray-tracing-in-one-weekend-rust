@@ -3,13 +3,14 @@ use ray_tracing_in_one_weekend::{
     color,
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
+    material::{Lambertian, Metal},
     point3,
     ray::Ray,
     rtweekend::{random, Color, Point3, INFINITY},
     sphere::Sphere,
     utils::write_color,
-    vec3::random_in_hemisphere,
 };
+use std::rc::Rc;
 
 fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
     let mut rec = HitRecord::default();
@@ -19,8 +20,17 @@ fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
     }
 
     if world.hit(&r, 0.001, INFINITY, &mut rec) {
-        let target = rec.p + random_in_hemisphere(rec.normal);
-        return 0.5 * ray_color(Ray::new(rec.p, target - rec.p), world, depth - 1);
+        let mut scattered = Ray::default();
+        let mut attenuation = Color::default();
+        if rec.opt_mat_ptr.as_ref().expect("Material not set").scatter(
+            &r,
+            &rec,
+            &mut attenuation,
+            &mut scattered,
+        ) {
+            return attenuation * ray_color(scattered, world, depth - 1);
+        }
+        return color!(0, 0, 0);
     }
 
     let unit_direction = r.dir.unit();

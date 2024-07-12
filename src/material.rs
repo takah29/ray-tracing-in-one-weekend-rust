@@ -1,6 +1,6 @@
 use crate::hittable::HitRecord;
 use crate::rtweekend::{Color, Ray};
-use crate::vec3::random_unit_vector;
+use crate::vec3::{random_unit_vector, reflect};
 
 pub trait Material {
     fn scatter(
@@ -37,4 +37,27 @@ impl Material for Lambertian {
     }
 }
 
-pub struct Metal {}
+pub struct Metal {
+    albedo: Color,
+}
+
+impl Metal {
+    pub fn new(albedo: &Color) -> Self {
+        Self { albedo: *albedo }
+    }
+}
+
+impl Material for Metal {
+    fn scatter(
+        &self,
+        r_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool {
+        let reflected = reflect(&r_in.dir.unit(), &rec.normal);
+        *scattered = Ray::new(rec.p, reflected);
+        *attenuation = self.albedo;
+        scattered.dir.dot(rec.normal) > 0.0
+    }
+}
