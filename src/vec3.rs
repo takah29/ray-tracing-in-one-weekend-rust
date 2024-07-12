@@ -49,7 +49,7 @@ pub fn random_unit_vector() -> Vec3 {
 
 pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
     let in_unit_sphere = random_in_unit_sphere();
-    if in_unit_sphere * normal > 0.0 {
+    if in_unit_sphere.dot(normal) > 0.0 {
         return in_unit_sphere;
     } else {
         return -in_unit_sphere;
@@ -90,7 +90,7 @@ impl Vec3 {
     }
 
     pub fn dot(self, other: Self) -> f64 {
-        self * other
+        self.e[0] * other.e[0] + self.e[1] * other.e[1] + self.e[2] * other.e[2]
     }
 
     pub fn cross(self, other: Self) -> Self {
@@ -214,12 +214,17 @@ impl Mul<Vec3> for f64 {
     }
 }
 
-// Inner Product
 impl Mul<Vec3> for Vec3 {
-    type Output = f64;
+    type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        self.e[0] * rhs.e[0] + self.e[1] * rhs.e[1] + self.e[2] * rhs.e[2]
+        Self {
+            e: [
+                self.e[0] * rhs.e[0],
+                self.e[1] * rhs.e[1],
+                self.e[2] * rhs.e[2],
+            ],
+        }
     }
 }
 
@@ -510,8 +515,8 @@ mod tests {
     #[test]
     fn test_mul_vec3_vec3() {
         let test_cases = vec![
-            (vec3!(1, 2, 3), vec3!(4, 5, 6), 32.0),
-            (vec3!(-1, -2, -3), vec3!(1, 2, 3), -14.0),
+            (vec3!(1, 2, 3), vec3!(4, 5, 6), vec3!(4, 10, 18)),
+            (vec3!(-1, -2, -3), vec3!(1, 2, 3), vec3!(-1, -4, -9)),
         ];
 
         for (lhs, rhs, expected) in test_cases {
