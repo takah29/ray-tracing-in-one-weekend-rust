@@ -62,12 +62,12 @@ fn main() {
     world.add(Box::new(Sphere::new(
         point3!(1, 0, -1),
         0.5,
-        Rc::new(Metal::new(&color!(0.8, 0.6, 0.2))),
+        Rc::new(Metal::new(&color!(0.8, 0.6, 0.2), 1.0)),
     )));
     world.add(Box::new(Sphere::new(
         point3!(-1, 0, -1),
         0.5,
-        Rc::new(Metal::new(&color!(0.8, 0.8, 0.8))),
+        Rc::new(Metal::new(&color!(0.8, 0.8, 0.8), 0.3)),
     )));
 
     let cam = Camera::new();
