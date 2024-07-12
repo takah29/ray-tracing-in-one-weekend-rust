@@ -6,11 +6,11 @@ use std::rc::Rc;
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
-    pub mat_ptr: Option<Rc<dyn Material>>,
+    pub mat_ptr: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, mat_ptr: Option<Rc<dyn Material>>) -> Self {
+    pub fn new(center: Point3, radius: f64, mat_ptr: Rc<dyn Material>) -> Self {
         Self {
             center,
             radius,
@@ -37,7 +37,7 @@ impl Hittable for Sphere {
                 rec.p = r.clone().at(rec.t);
                 let outward_normal = (rec.p - self.center) / self.radius;
                 rec.set_face_normal(r, &outward_normal);
-                rec.mat_ptr = self.mat_ptr.clone();
+                rec.opt_mat_ptr = Some(self.mat_ptr.clone());
                 return true;
             }
 
@@ -49,7 +49,7 @@ impl Hittable for Sphere {
                 rec.p = r.clone().at(rec.t);
                 let outward_normal = (rec.p - self.center) / self.radius;
                 rec.set_face_normal(r, &outward_normal);
-                rec.mat_ptr = self.mat_ptr.clone();
+                rec.opt_mat_ptr = Some(self.mat_ptr.clone());
                 return true;
             }
         }
