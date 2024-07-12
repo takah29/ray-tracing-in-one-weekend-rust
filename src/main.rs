@@ -48,8 +48,27 @@ fn main() {
     println!("P3\n{} {}\n255", image_width, image_height);
 
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(point3!(0, 0, -1), 0.5)));
-    world.add(Box::new(Sphere::new(point3!(0, -100.5, -1), 100.0)));
+
+    world.add(Box::new(Sphere::new(
+        point3!(0, 0, -1),
+        0.5,
+        Rc::new(Lambertian::new(&color!(0.7, 0.3, 0.3))),
+    )));
+    world.add(Box::new(Sphere::new(
+        point3!(0, -100.5, -1),
+        100.0,
+        Rc::new(Lambertian::new(&color!(0.8, 0.8, 0.0))),
+    )));
+    world.add(Box::new(Sphere::new(
+        point3!(1, 0, -1),
+        0.5,
+        Rc::new(Metal::new(&color!(0.8, 0.6, 0.2))),
+    )));
+    world.add(Box::new(Sphere::new(
+        point3!(-1, 0, -1),
+        0.5,
+        Rc::new(Metal::new(&color!(0.8, 0.8, 0.8))),
+    )));
 
     let cam = Camera::new();
 
