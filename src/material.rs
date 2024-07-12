@@ -1,6 +1,7 @@
+use crate::color;
 use crate::hittable::HitRecord;
 use crate::rtweekend::{Color, Ray};
-use crate::vec3::{random_in_unit_sphere, random_unit_vector, reflect};
+use crate::vec3::{random_in_unit_sphere, random_unit_vector, reflect, refract};
 
 pub trait Material {
     fn scatter(
@@ -63,5 +64,37 @@ impl Material for Metal {
         *scattered = Ray::new(rec.p, reflected + self.fuzz * random_in_unit_sphere());
         *attenuation = self.albedo;
         scattered.dir.dot(rec.normal) > 0.0
+    }
+}
+
+pub struct Dielectric {
+    ref_idx: f64,
+}
+
+impl Dielectric {
+    pub fn new(ref_idx: f64) -> Self {
+        Self { ref_idx }
+    }
+}
+
+impl Material for Dielectric {
+    fn scatter(
+        &self,
+        r_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool {
+        *attenuation = color!(1, 1, 1);
+        let etai_over_etat = if rec.front_face {
+            1.0 / self.ref_idx
+        } else {
+            self.ref_idx
+        };
+
+        let unit_direction = r_in.dir.unit();
+        let refracted = refract(&unit_direction, &rec.normal, etai_over_etat);
+        *scattered = Ray::new(rec.p, refracted);
+        true
     }
 }
