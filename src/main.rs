@@ -1,14 +1,13 @@
 use ray_tracing_in_one_weekend::{
     camera::Camera,
-    color,
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
-    material::Lambertian,
-    point3,
+    material::{Dielectric, Lambertian, Metal},
     ray::Ray,
-    rtweekend::{random, Color, Point3, INFINITY, PI},
+    rtweekend::{random, Color, Point3, Vec3, INFINITY},
     sphere::Sphere,
     utils::write_color,
+    {color, point3, vec3},
 };
 use std::rc::Rc;
 
@@ -49,19 +48,39 @@ fn main() {
 
     let mut world = HittableList::new();
 
-    let r = (PI / 4.0).cos();
     world.add(Box::new(Sphere::new(
-        point3!(-r, 0, -1),
-        r,
-        Rc::new(Lambertian::new(&color!(0, 0, 1))),
+        point3!(0, 0, -1),
+        0.5,
+        Rc::new(Lambertian::new(&color!(0.1, 0.2, 0.5))),
     )));
     world.add(Box::new(Sphere::new(
-        point3!(r, 0, -1),
-        r,
-        Rc::new(Lambertian::new(&color!(1, 0, 0))),
+        point3!(0, -100.5, -1),
+        100.0,
+        Rc::new(Lambertian::new(&color!(0.8, 0.8, 0.0))),
+    )));
+    world.add(Box::new(Sphere::new(
+        point3!(1, 0, -1),
+        0.5,
+        Rc::new(Metal::new(&color!(0.8, 0.6, 0.2), 0.0)),
+    )));
+    world.add(Box::new(Sphere::new(
+        point3!(-1, 0, -1),
+        0.5,
+        Rc::new(Dielectric::new(1.5)),
+    )));
+    world.add(Box::new(Sphere::new(
+        point3!(-1, 0, -1),
+        -0.45,
+        Rc::new(Dielectric::new(1.5)),
     )));
 
-    let cam = Camera::new(90.0, image_width as f64 / image_height as f64);
+    let cam = Camera::new(
+        point3!(-2, 2, 1),
+        point3!(0, 0, -1),
+        vec3!(0, 1, 0),
+        20.0,
+        aspect_ratio,
+    );
 
     for j in (0..image_height).rev() {
         eprint!("\rScanline remaining: {:3}", j);
