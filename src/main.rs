@@ -3,7 +3,7 @@ use ray_tracing_in_one_weekend::{
     color,
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
-    material::{Lambertian, Metal},
+    material::{Dielectric, Lambertian, Metal},
     point3,
     ray::Ray,
     rtweekend::{random, Color, Point3, INFINITY},
@@ -52,7 +52,7 @@ fn main() {
     world.add(Box::new(Sphere::new(
         point3!(0, 0, -1),
         0.5,
-        Rc::new(Lambertian::new(&color!(0.7, 0.3, 0.3))),
+        Rc::new(Lambertian::new(&color!(0.1, 0.2, 0.5))),
     )));
     world.add(Box::new(Sphere::new(
         point3!(0, -100.5, -1),
@@ -62,12 +62,12 @@ fn main() {
     world.add(Box::new(Sphere::new(
         point3!(1, 0, -1),
         0.5,
-        Rc::new(Metal::new(&color!(0.8, 0.6, 0.2), 1.0)),
+        Rc::new(Metal::new(&color!(0.8, 0.6, 0.2), 0.0)),
     )));
     world.add(Box::new(Sphere::new(
         point3!(-1, 0, -1),
         0.5,
-        Rc::new(Metal::new(&color!(0.8, 0.8, 0.8), 0.3)),
+        Rc::new(Dielectric::new(1.5)),
     )));
 
     let cam = Camera::new();
