@@ -300,7 +300,7 @@ impl DivAssign<f64> for Vec3 {
 
 // ========== PartialEq ==========
 
-// 数値計算の誤差で完全一致しない場合があるのでEPSILONの統合を許す
+// 数値計算の誤差で完全一致しない場合があるのでEPSILONの誤差を許容する
 impl PartialEq for Vec3 {
     fn eq(&self, other: &Self) -> bool {
         (self.e[0] - other.e[0]).abs() < f64::EPSILON
