@@ -74,12 +74,20 @@ fn main() {
         Rc::new(Dielectric::new(1.5)),
     )));
 
+    let lookfrom = point3!(3, 3, 2);
+    let lookat = point3!(0, 0, -1);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = (lookfrom - lookat).length();
+    let aperture = 2.0;
+
     let cam = Camera::new(
-        point3!(-2, 2, 1),
-        point3!(0, 0, -1),
-        vec3!(0, 1, 0),
+        lookfrom,
+        lookat,
+        vup,
         20.0,
         aspect_ratio,
+        aperture,
+        dist_to_focus,
     );
 
     for j in (0..image_height).rev() {
