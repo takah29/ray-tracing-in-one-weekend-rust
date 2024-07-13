@@ -1,4 +1,4 @@
-use ray_tracing_in_one_weekend::{
+use in_one_weekend::{
     camera::Camera,
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
