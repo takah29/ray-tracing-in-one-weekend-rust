@@ -1,6 +1,7 @@
 use crate::point3;
 use crate::rtweekend::{Point3, Ray};
 
+#[derive(Clone)]
 pub struct AABB {
     min: Point3,
     max: Point3,

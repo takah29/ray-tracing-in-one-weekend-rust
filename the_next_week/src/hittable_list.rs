@@ -1,5 +1,7 @@
+use crate::aabb::{surrounding_box, AABB};
 use crate::hittable::{HitRecord, Hittable};
-use crate::rtweekend::Ray;
+use crate::point3;
+use crate::rtweekend::{Point3, Ray, INFINITY};
 
 pub struct HittableList {
     pub objects: Vec<Box<dyn Hittable>>,
@@ -41,5 +43,31 @@ impl Hittable for HittableList {
             }
         }
         hit_anything
+    }
+
+    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut crate::aabb::AABB) -> bool {
+        if self.objects.is_empty() {
+            return false;
+        }
+
+        let mut temp_box = AABB::new(
+            point3!(-INFINITY, -INFINITY, -INFINITY),
+            point3!(INFINITY, INFINITY, INFINITY),
+        );
+        let mut first_box = true;
+
+        for object in &self.objects {
+            if object.bounding_box(t0, t1, &mut temp_box) {
+                return false;
+            }
+            *output_box = if first_box {
+                temp_box.clone()
+            } else {
+                surrounding_box(output_box.clone(), temp_box.clone())
+            };
+            first_box = false;
+        }
+
+        true
     }
 }
