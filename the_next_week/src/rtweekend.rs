@@ -21,6 +21,10 @@ pub fn random_range(min: f64, max: f64) -> f64 {
     RNG.with(|rng| rng.borrow_mut().gen_range(min..max))
 }
 
+pub fn random_int(min: i32, max: i32) -> i32 {
+    RNG.with(|rng| rng.borrow_mut().gen_range(min..=max))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
