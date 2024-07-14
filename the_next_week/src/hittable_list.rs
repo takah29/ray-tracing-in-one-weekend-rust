@@ -50,10 +50,7 @@ impl Hittable for HittableList {
             return false;
         }
 
-        let mut temp_box = AABB::new(
-            point3!(-INFINITY, -INFINITY, -INFINITY),
-            point3!(INFINITY, INFINITY, INFINITY),
-        );
+        let mut temp_box = AABB::new_with_inf();
         let mut first_box = true;
 
         for object in &self.objects {

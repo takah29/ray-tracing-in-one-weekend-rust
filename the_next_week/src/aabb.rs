@@ -1,5 +1,5 @@
 use crate::point3;
-use crate::rtweekend::{Point3, Ray};
+use crate::rtweekend::{Point3, Ray, INFINITY};
 
 #[derive(Clone)]
 pub struct AABB {
@@ -10,6 +10,13 @@ pub struct AABB {
 impl AABB {
     pub fn new(min: Point3, max: Point3) -> Self {
         Self { min, max }
+    }
+
+    pub fn new_with_inf() -> Self {
+        Self::new(
+            point3!(-INFINITY, -INFINITY, -INFINITY),
+            point3!(INFINITY, INFINITY, INFINITY),
+        )
     }
 
     pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {
