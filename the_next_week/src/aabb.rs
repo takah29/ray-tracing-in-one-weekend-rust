@@ -1,0 +1,29 @@
+use crate::rtweekend::{Point3, Ray};
+
+pub struct AABB {
+    min: Point3,
+    max: Point3,
+}
+
+impl AABB {
+    pub fn new(min: Point3, max: Point3) -> Self {
+        Self { min, max }
+    }
+
+    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {
+        for axis_num in 0..3 {
+            let inv_d = 1.0 / r.dir.e[axis_num];
+            let mut t0 = (self.min.e[axis_num] - r.orig.e[axis_num]) * inv_d;
+            let mut t1 = (self.max.e[axis_num] - r.orig.e[axis_num]) * inv_d;
+            if inv_d < 0.0 {
+                (t0, t1) = (t1, t0);
+            }
+            let t_min = if t0 > t_min { t0 } else { t_min };
+            let t_max = if t1 > t_max { t1 } else { t_max };
+            if t_max <= t_min {
+                return false;
+            }
+        }
+        true
+    }
+}
