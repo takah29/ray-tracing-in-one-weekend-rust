@@ -1,3 +1,4 @@
+use crate::point3;
 use crate::rtweekend::{Point3, Ray};
 
 pub struct AABB {
@@ -26,4 +27,18 @@ impl AABB {
         }
         true
     }
+}
+
+pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
+    let small = point3!(
+        box0.min.e[0].min(box1.min.e[0]),
+        box0.min.e[1].min(box1.min.e[1]),
+        box0.min.e[2].min(box1.min.e[2])
+    );
+    let big = point3!(
+        box0.max.e[0].min(box1.max.e[0]),
+        box0.max.e[1].min(box1.max.e[1]),
+        box0.max.e[2].min(box1.max.e[2])
+    );
+    AABB::new(small, big)
 }

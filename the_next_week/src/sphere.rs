@@ -1,6 +1,8 @@
+use crate::aabb::AABB;
 use crate::hittable::{HitRecord, Hittable};
 use crate::material::Material;
-use crate::rtweekend::{Point3, Ray};
+use crate::rtweekend::{Point3, Ray, Vec3};
+use crate::vec3;
 use std::rc::Rc;
 
 pub struct Sphere {
@@ -54,5 +56,13 @@ impl Hittable for Sphere {
             }
         }
         false
+    }
+
+    fn bounding_box(&self, _: f64, _: f64, output_box: &mut AABB) -> bool {
+        *output_box = AABB::new(
+            self.center - vec3!(self.radius, self.radius, self.radius),
+            self.center + vec3!(self.radius, self.radius, self.radius),
+        );
+        true
     }
 }
