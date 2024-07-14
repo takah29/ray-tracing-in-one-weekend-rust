@@ -1,10 +1,10 @@
 use crate::aabb::{surrounding_box, AABB};
 use crate::hittable::{HitRecord, Hittable};
-use crate::point3;
-use crate::rtweekend::{Point3, Ray, INFINITY};
+use crate::rtweekend::Ray;
+use std::rc::Rc;
 
 pub struct HittableList {
-    pub objects: Vec<Box<dyn Hittable>>,
+    pub objects: Vec<Rc<dyn Hittable>>,
 }
 
 impl HittableList {
@@ -14,13 +14,13 @@ impl HittableList {
         }
     }
 
-    pub fn new_with_object(object: Box<dyn Hittable>) -> Self {
+    pub fn new_with_object(object: Rc<dyn Hittable>) -> Self {
         let mut list = Self::new();
         list.add(object);
         list
     }
 
-    pub fn add(&mut self, object: Box<dyn Hittable>) {
+    pub fn add(&mut self, object: Rc<dyn Hittable>) {
         self.objects.push(object);
     }
 
@@ -54,7 +54,7 @@ impl Hittable for HittableList {
         let mut first_box = true;
 
         for object in &self.objects {
-            if object.bounding_box(t0, t1, &mut temp_box) {
+            if !object.bounding_box(t0, t1, &mut temp_box) {
                 return false;
             }
             *output_box = if first_box {

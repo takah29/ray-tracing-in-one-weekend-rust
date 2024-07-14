@@ -28,7 +28,7 @@ impl AABB {
                 (t0, t1) = (t1, t0);
             }
             let t_min = if t0 > t_min { t0 } else { t_min };
-            let t_max = if t1 > t_max { t1 } else { t_max };
+            let t_max = if t1 < t_max { t1 } else { t_max };
             if t_max <= t_min {
                 return false;
             }
@@ -44,9 +44,9 @@ pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
         box0.min.e[2].min(box1.min.e[2])
     );
     let big = point3!(
-        box0.max.e[0].min(box1.max.e[0]),
-        box0.max.e[1].min(box1.max.e[1]),
-        box0.max.e[2].min(box1.max.e[2])
+        box0.max.e[0].max(box1.max.e[0]),
+        box0.max.e[1].max(box1.max.e[1]),
+        box0.max.e[2].max(box1.max.e[2])
     );
     AABB::new(small, big)
 }

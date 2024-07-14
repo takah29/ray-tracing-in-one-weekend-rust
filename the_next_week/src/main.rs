@@ -1,5 +1,6 @@
 use std::rc::Rc;
 use the_next_week::{
+    bvh::BvhNode,
     camera::Camera,
     color,
     hittable::{HitRecord, Hittable},
@@ -14,7 +15,7 @@ use the_next_week::{
     vec3,
 };
 
-fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
+fn ray_color(r: Ray, world: &Box<dyn Hittable>, depth: i32) -> Color {
     let mut rec = HitRecord::default();
 
     if depth <= 0 {
@@ -44,7 +45,7 @@ fn random_scene() -> HittableList {
     let mut world = HittableList::new();
 
     let ground_material = Rc::new(Lambertian::new(&color!(0.5, 0.5, 0.5)));
-    world.add(Box::new(Sphere::new(
+    world.add(Rc::new(Sphere::new(
         point3!(0, -1000, 0),
         1000.0,
         ground_material,
@@ -61,7 +62,7 @@ fn random_scene() -> HittableList {
                     let albedo = Color::random() * Color::random();
                     let sphere_material = Rc::new(Lambertian::new(&albedo));
                     let center2 = center + vec3!(0, random_range(0.0, 0.5), 0);
-                    world.add(Box::new(MovingSphere::new(
+                    world.add(Rc::new(MovingSphere::new(
                         center,
                         center2,
                         0.0,
@@ -74,22 +75,22 @@ fn random_scene() -> HittableList {
                     let albedo = Color::random_range(0.5, 1.0);
                     let fuzz = random();
                     let sphere_material = Rc::new(Metal::new(&albedo, fuzz));
-                    world.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
                     // grass
                     let sphere_material = Rc::new(Dielectric::new(1.5));
-                    world.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
                 };
             }
         }
     }
 
     let material1 = Rc::new(Dielectric::new(1.5));
-    world.add(Box::new(Sphere::new(point3!(0, 1, 0), 1.0, material1)));
+    world.add(Rc::new(Sphere::new(point3!(0, 1, 0), 1.0, material1)));
     let material2 = Rc::new(Lambertian::new(&color!(0.4, 0.2, 0.1)));
-    world.add(Box::new(Sphere::new(point3!(-4, 1, 0), 1.0, material2)));
+    world.add(Rc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material2)));
     let material3 = Rc::new(Metal::new(&color!(0.7, 0.6, 0.5), 0.0));
-    world.add(Box::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));
+    world.add(Rc::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));
 
     world
 }
@@ -103,7 +104,8 @@ fn main() {
 
     println!("P3\n{} {}\n255", image_width, image_height);
 
-    let world = random_scene();
+    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut random_scene(), 0.0, 1.0));
+    // let world: Box<dyn Hittable> = Box::new(random_scene());
 
     let lookfrom = point3!(13, 2, 3);
     let lookat = point3!(0, 0, 0);

@@ -4,16 +4,18 @@ use crate::{
     hittable_list::HittableList,
     rtweekend::{random_int, Ray},
 };
+use std::cmp::Ordering;
+use std::rc::Rc;
 
 pub struct BvhNode {
-    left: Box<dyn Hittable>,
-    right: Box<dyn Hittable>,
+    left: Rc<dyn Hittable>,
+    right: Rc<dyn Hittable>,
     bbox: AABB,
 }
 
 impl BvhNode {
     pub fn new(
-        objects: &Vec<Box<dyn Hittable>>,
+        objects: &mut Vec<Rc<dyn Hittable>>,
         start: usize,
         end: usize,
         time0: f64,
@@ -29,27 +31,27 @@ impl BvhNode {
 
         let object_span = end - start;
 
-        let (left, right) = match object_span {
-            1 => (objects[start], objects[start]),
+        let (left, right): (Rc<dyn Hittable>, Rc<dyn Hittable>) = match object_span {
+            1 => (objects[start].clone(), objects[start].clone()),
             2 => {
-                if comparator(objects[start], objects[start + 1]) {
-                    (objects[start], objects[start + 1])
+                if comparator(&objects[start], &objects[start + 1]) == Ordering::Less {
+                    (objects[start].clone(), objects[start + 1].clone())
                 } else {
-                    (objects[start + 1], objects[start])
+                    (objects[start + 1].clone(), objects[start].clone())
                 }
             }
             _ => {
                 objects[start..end].sort_by(comparator);
                 let mid = start + object_span / 2;
                 (
-                    BvhNode::new(objects, start, mid, time0, time1),
-                    BvhNode::new(objects, mid, end, time0, time1),
+                    Rc::new(BvhNode::new(objects, start, mid, time0, time1)),
+                    Rc::new(BvhNode::new(objects, mid, end, time0, time1)),
                 )
             }
         };
 
-        let box_left = AABB::new_with_inf();
-        let box_right = AABB::new_with_inf();
+        let mut box_left = AABB::new_with_inf();
+        let mut box_right = AABB::new_with_inf();
 
         if !left.bounding_box(time0, time1, &mut box_left)
             || !right.bounding_box(time0, time1, &mut box_right)
@@ -62,14 +64,15 @@ impl BvhNode {
         Self { left, right, bbox }
     }
 
-    pub fn new_with_list(list: HittableList, time0: f64, time1: f64) -> Self {
-        Self::new(&list.objects, 0, list.objects.len(), time0, time1)
+    pub fn new_with_list(list: &mut HittableList, time0: f64, time1: f64) -> Self {
+        let length = list.objects.len();
+        Self::new(&mut list.objects, 0, length, time0, time1)
     }
 }
 
 impl Hittable for BvhNode {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        if self.bbox.hit(r, t_min, t_max) {
+        if !self.bbox.hit(r, t_min, t_max) {
             return false;
         }
 
@@ -87,7 +90,7 @@ impl Hittable for BvhNode {
     }
 }
 
-fn box_compare(a: Box<dyn Hittable>, b: Box<dyn Hittable>, axis: usize) -> bool {
+fn box_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>, axis: usize) -> Ordering {
     let mut box_a = AABB::new_with_inf();
     let mut box_b = AABB::new_with_inf();
 
@@ -95,17 +98,19 @@ fn box_compare(a: Box<dyn Hittable>, b: Box<dyn Hittable>, axis: usize) -> bool 
         eprintln!("No bounding box in bvh_node constructor.");
     }
 
-    box_a.min.e[axis] < box_b.min.e[axis]
+    box_a.min.e[axis]
+        .partial_cmp(&box_b.min.e[axis])
+        .unwrap_or(Ordering::Equal)
 }
 
-fn box_x_compare(a: Box<dyn Hittable>, b: Box<dyn Hittable>) -> bool {
+fn box_x_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>) -> Ordering {
     box_compare(a, b, 0)
 }
 
-fn box_y_compare(a: Box<dyn Hittable>, b: Box<dyn Hittable>) -> bool {
+fn box_y_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>) -> Ordering {
     box_compare(a, b, 1)
 }
 
-fn box_z_compare(a: Box<dyn Hittable>, b: Box<dyn Hittable>) -> bool {
+fn box_z_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>) -> Ordering {
     box_compare(a, b, 2)
 }
