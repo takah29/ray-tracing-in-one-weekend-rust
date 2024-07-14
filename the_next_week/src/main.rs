@@ -1,14 +1,17 @@
 use std::rc::Rc;
 use the_next_week::{
     camera::Camera,
+    color,
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
-    material::{Dielectric, Lambertian, Material, Metal},
+    material::{Dielectric, Lambertian, Metal},
+    moving_sphere::MovingSphere,
+    point3,
     ray::Ray,
-    rtweekend::{random, Color, Point3, Vec3, INFINITY},
+    rtweekend::{random, random_range, Color, Point3, Vec3, INFINITY},
     sphere::Sphere,
     utils::write_color,
-    {color, point3, vec3},
+    vec3,
 };
 
 fn ray_color(r: Ray, world: &HittableList, depth: i32) -> Color {
@@ -53,20 +56,30 @@ fn random_scene() -> HittableList {
             let center = point3!(a as f64 + 0.9 * random(), 0.2, b as f64 + random());
 
             if (center - vec3!(4, 0.2, 0)).length() > 0.9 {
-                let sphere_material: Rc<dyn Material> = if choose_mat < 0.8 {
+                if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random() * Color::random();
-                    Rc::new(Lambertian::new(&albedo))
+                    let sphere_material = Rc::new(Lambertian::new(&albedo));
+                    let center2 = center + vec3!(0, random_range(0.0, 0.5), 0);
+                    world.add(Box::new(MovingSphere::new(
+                        center,
+                        center2,
+                        0.0,
+                        1.0,
+                        0.2,
+                        sphere_material,
+                    )));
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random_range(0.5, 1.0);
                     let fuzz = random();
-                    Rc::new(Metal::new(&albedo, fuzz))
+                    let sphere_material = Rc::new(Metal::new(&albedo, fuzz));
+                    world.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
                     // grass
-                    Rc::new(Dielectric::new(1.5))
+                    let sphere_material = Rc::new(Dielectric::new(1.5));
+                    world.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
                 };
-                world.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
             }
         }
     }
@@ -106,6 +119,8 @@ fn main() {
         aspect_ratio,
         aperture,
         dist_to_focus,
+        0.0,
+        1.0,
     );
 
     for j in (0..image_height).rev() {
