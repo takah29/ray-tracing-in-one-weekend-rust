@@ -86,3 +86,26 @@ impl Hittable for BvhNode {
         true
     }
 }
+
+fn box_compare(a: Box<dyn Hittable>, b: Box<dyn Hittable>, axis: usize) -> bool {
+    let mut box_a = AABB::new_with_inf();
+    let mut box_b = AABB::new_with_inf();
+
+    if !a.bounding_box(0.0, 0.0, &mut box_a) || !b.bounding_box(0.0, 0.0, &mut box_b) {
+        eprintln!("No bounding box in bvh_node constructor.");
+    }
+
+    box_a.min.e[axis] < box_b.min.e[axis]
+}
+
+fn box_x_compare(a: Box<dyn Hittable>, b: Box<dyn Hittable>) -> bool {
+    box_compare(a, b, 0)
+}
+
+fn box_y_compare(a: Box<dyn Hittable>, b: Box<dyn Hittable>) -> bool {
+    box_compare(a, b, 1)
+}
+
+fn box_z_compare(a: Box<dyn Hittable>, b: Box<dyn Hittable>) -> bool {
+    box_compare(a, b, 2)
+}
