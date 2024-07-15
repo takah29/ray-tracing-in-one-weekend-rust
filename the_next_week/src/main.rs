@@ -11,6 +11,7 @@ use the_next_week::{
     ray::Ray,
     rtweekend::{random, random_range, Color, Point3, Vec3, INFINITY},
     sphere::Sphere,
+    texture::SolidColor,
     utils::write_color,
     vec3,
 };
@@ -44,7 +45,9 @@ fn ray_color(r: Ray, world: &Box<dyn Hittable>, depth: i32) -> Color {
 fn random_scene() -> HittableList {
     let mut world = HittableList::new();
 
-    let ground_material = Rc::new(Lambertian::new(&color!(0.5, 0.5, 0.5)));
+    let ground_material = Rc::new(Lambertian::new(Rc::new(SolidColor::new(color!(
+        0.5, 0.5, 0.5
+    )))));
     world.add(Rc::new(Sphere::new(
         point3!(0, -1000, 0),
         1000.0,
@@ -60,7 +63,8 @@ fn random_scene() -> HittableList {
                 if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random() * Color::random();
-                    let sphere_material = Rc::new(Lambertian::new(&albedo));
+                    let sphere_material =
+                        Rc::new(Lambertian::new(Rc::new(SolidColor::new(albedo))));
                     let center2 = center + vec3!(0, random_range(0.0, 0.5), 0);
                     world.add(Rc::new(MovingSphere::new(
                         center,
@@ -87,7 +91,9 @@ fn random_scene() -> HittableList {
 
     let material1 = Rc::new(Dielectric::new(1.5));
     world.add(Rc::new(Sphere::new(point3!(0, 1, 0), 1.0, material1)));
-    let material2 = Rc::new(Lambertian::new(&color!(0.4, 0.2, 0.1)));
+    let material2 = Rc::new(Lambertian::new(Rc::new(SolidColor::new(color!(
+        0.4, 0.2, 0.1
+    )))));
     world.add(Rc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material2)));
     let material3 = Rc::new(Metal::new(&color!(0.7, 0.6, 0.5), 0.0));
     world.add(Rc::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));

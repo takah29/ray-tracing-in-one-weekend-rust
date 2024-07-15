@@ -1,7 +1,7 @@
 use crate::aabb::AABB;
 use crate::hittable::{HitRecord, Hittable};
 use crate::material::Material;
-use crate::rtweekend::{Point3, Ray, Vec3};
+use crate::rtweekend::{Point3, Ray, Vec3, PI};
 use crate::vec3;
 use std::rc::Rc;
 
@@ -65,4 +65,11 @@ impl Hittable for Sphere {
         );
         true
     }
+}
+
+fn get_sphere_uv(p: &Point3, u: &mut f64, v: &mut f64) {
+    let phi = f64::atan2(p.e[2], p.e[0]);
+    let theta = p.e[1].sin();
+    *u = 1.0 - (phi + PI) / (2.0 * PI);
+    *v = (theta + PI / 2.0) / PI;
 }
