@@ -103,6 +103,28 @@ fn random_scene() -> HittableList {
     world
 }
 
+fn two_spheres() -> HittableList {
+    let mut world = HittableList::new();
+
+    let checker = Rc::new(CheckerTexture::new(
+        Rc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
+        Rc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
+    ));
+
+    world.add(Rc::new(Sphere::new(
+        point3!(0, -10, 0),
+        10.0,
+        Rc::new(Lambertian::new(checker.clone())),
+    )));
+    world.add(Rc::new(Sphere::new(
+        point3!(0, 10, 0),
+        10.0,
+        Rc::new(Lambertian::new(checker.clone())),
+    )));
+
+    world
+}
+
 fn main() {
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 384;
@@ -112,14 +134,14 @@ fn main() {
 
     println!("P3\n{} {}\n255", image_width, image_height);
 
-    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut random_scene(), 0.0, 1.0));
+    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut two_spheres(), 0.0, 1.0));
     // let world: Box<dyn Hittable> = Box::new(random_scene());
 
     let lookfrom = point3!(13, 2, 3);
     let lookat = point3!(0, 0, 0);
     let vup = vec3!(0, 1, 0);
     let dist_to_focus = 10.0;
-    let aperture = 0.1;
+    let aperture = 0.0;
 
     let cam = Camera::new(
         lookfrom,
