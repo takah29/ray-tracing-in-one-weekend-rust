@@ -8,5 +8,6 @@ pub mod moving_sphere;
 pub mod ray;
 pub mod rtweekend;
 pub mod sphere;
+pub mod texture;
 pub mod utils;
 pub mod vec3;
