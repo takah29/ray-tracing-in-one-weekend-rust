@@ -11,7 +11,7 @@ use the_next_week::{
     ray::Ray,
     rtweekend::{random, random_range, Color, Point3, Vec3, INFINITY},
     sphere::Sphere,
-    texture::SolidColor,
+    texture::{CheckerTexture, SolidColor},
     utils::write_color,
     vec3,
 };
@@ -45,9 +45,11 @@ fn ray_color(r: Ray, world: &Box<dyn Hittable>, depth: i32) -> Color {
 fn random_scene() -> HittableList {
     let mut world = HittableList::new();
 
-    let ground_material = Rc::new(Lambertian::new(Rc::new(SolidColor::new(color!(
-        0.5, 0.5, 0.5
-    )))));
+    let checker = Rc::new(CheckerTexture::new(
+        Rc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
+        Rc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
+    ));
+    let ground_material = Rc::new(Lambertian::new(checker));
     world.add(Rc::new(Sphere::new(
         point3!(0, -1000, 0),
         1000.0,
