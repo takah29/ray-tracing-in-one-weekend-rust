@@ -1,0 +1,7 @@
+[package]
+name = "render_2d_parallel"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rayon = "1.10.0"
