@@ -28,9 +28,12 @@ impl Perlin {
         let i = p.e[0].floor() as i32;
         let j = p.e[1].floor() as i32;
         let k = p.e[2].floor() as i32;
-        let u = p.e[0] - i as f64;
-        let v = p.e[1] - j as f64;
-        let w = p.e[2] - k as f64;
+        let mut u = p.e[0] - i as f64;
+        let mut v = p.e[1] - j as f64;
+        let mut w = p.e[2] - k as f64;
+        u = u * u * (3.0 - 2.0 * u);
+        v = v * v * (3.0 - 2.0 * v);
+        w = w * w * (3.0 - 2.0 * w);
 
         let mut c = [[[0.0; 2]; 2]; 2];
 
