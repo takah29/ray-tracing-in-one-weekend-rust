@@ -1,4 +1,5 @@
 pub mod aabb;
+pub mod build_scene;
 pub mod bvh;
 pub mod camera;
 pub mod hittable;

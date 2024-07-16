@@ -67,6 +67,7 @@ impl Hittable for Sphere {
     }
 }
 
+#[allow(dead_code)]
 fn get_sphere_uv(p: &Point3, u: &mut f64, v: &mut f64) {
     let phi = f64::atan2(p.e[2], p.e[0]);
     let theta = p.e[1].sin();
