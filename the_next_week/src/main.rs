@@ -11,7 +11,7 @@ use the_next_week::{
     ray::Ray,
     rtweekend::{random, random_range, Color, Point3, Vec3, INFINITY},
     sphere::Sphere,
-    texture::{CheckerTexture, SolidColor},
+    texture::{CheckerTexture, NoiseTexture, SolidColor},
     utils::write_color,
     vec3,
 };
@@ -125,16 +125,36 @@ fn two_spheres() -> HittableList {
     world
 }
 
+fn two_perlin_spheres() -> HittableList {
+    let mut world = HittableList::new();
+
+    let pertext = Rc::new(NoiseTexture::new());
+
+    world.add(Rc::new(Sphere::new(
+        point3!(0, -1000, 0),
+        1000.0,
+        Rc::new(Lambertian::new(pertext.clone())),
+    )));
+    world.add(Rc::new(Sphere::new(
+        point3!(0, 2, 0),
+        2.0,
+        Rc::new(Lambertian::new(pertext.clone())),
+    )));
+
+    world
+}
+
 fn main() {
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 384;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 100;
+    let samples_per_pixel = 20;
     let max_depth = 50;
 
     println!("P3\n{} {}\n255", image_width, image_height);
 
-    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut two_spheres(), 0.0, 1.0));
+    let world: Box<dyn Hittable> =
+        Box::new(BvhNode::new_with_list(&mut two_perlin_spheres(), 0.0, 1.0));
     // let world: Box<dyn Hittable> = Box::new(random_scene());
 
     let lookfrom = point3!(13, 2, 3);

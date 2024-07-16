@@ -1,4 +1,8 @@
-use crate::rtweekend::{Color, Point3};
+use crate::{
+    color,
+    perlin::Perlin,
+    rtweekend::{Color, Point3},
+};
 use std::rc::Rc;
 
 pub trait Texture {
@@ -39,5 +43,22 @@ impl Texture for CheckerTexture {
         } else {
             return self.even.value(u, v, p);
         }
+    }
+}
+
+pub struct NoiseTexture {
+    noise: Perlin,
+}
+
+impl NoiseTexture {
+    pub fn new() -> Self {
+        let noise = Perlin::new();
+        Self { noise }
+    }
+}
+
+impl Texture for NoiseTexture {
+    fn value(&self, _: f64, _: f64, p: &Point3) -> Color {
+        color!(1, 1, 1) * self.noise.noise(p)
     }
 }
