@@ -11,30 +11,35 @@ use the_next_week::{
     vec3,
 };
 
-fn ray_color(r: Ray, world: &Box<dyn Hittable>, depth: i32) -> Color {
+fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) -> Color {
     let mut rec = HitRecord::default();
 
     if depth <= 0 {
         return color!(0, 0, 0);
     }
 
-    if world.hit(&r, 0.001, INFINITY, &mut rec) {
-        let mut scattered = Ray::default();
-        let mut attenuation = Color::default();
-        if rec.opt_mat_ptr.as_ref().expect("Material not set").scatter(
-            &r,
-            &rec,
-            &mut attenuation,
-            &mut scattered,
-        ) {
-            return attenuation * ray_color(scattered, world, depth - 1);
-        }
-        return color!(0, 0, 0);
+    if !world.hit(&r, 0.001, INFINITY, &mut rec) {
+        return *background;
     }
 
-    let unit_direction = r.dir.unit();
-    let t = 0.5 * (unit_direction.e[1] + 1.0);
-    (1.0 - t) * color!(1, 1, 1) + t * color!(0.5, 0.7, 1.0)
+    let mut scattered = Ray::default();
+    let mut attenuation = Color::default();
+    let emitted = rec
+        .opt_mat_ptr
+        .as_ref()
+        .expect("Material not set")
+        .emitted(rec.u, rec.v, &rec.p);
+
+    if !rec.opt_mat_ptr.as_ref().expect("Material not set").scatter(
+        &r,
+        &rec,
+        &mut attenuation,
+        &mut scattered,
+    ) {
+        return emitted;
+    }
+
+    emitted + attenuation * ray_color(r, background, world, depth - 1)
 }
 
 fn main() {
@@ -43,6 +48,7 @@ fn main() {
     let image_height = (image_width as f64 / aspect_ratio) as i32;
     let samples_per_pixel = 20;
     let max_depth = 50;
+    let background = color!(0, 0, 0);
 
     println!("P3\n{} {}\n255", image_width, image_height);
 
@@ -75,7 +81,7 @@ fn main() {
                 let v = (j as f64 + random()) / (image_height - 1) as f64;
                 let r = cam.get_ray(u, v);
 
-                pixel_color += ray_color(r, &world, max_depth);
+                pixel_color += ray_color(r, &background, &world, max_depth);
             }
             write_color(pixel_color, samples_per_pixel);
         }
