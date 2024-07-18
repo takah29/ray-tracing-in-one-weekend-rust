@@ -1,5 +1,5 @@
 use the_next_week::{
-    build_scene::two_perlin_spheres,
+    build_scene::earth,
     bvh::BvhNode,
     camera::Camera,
     color,
@@ -46,9 +46,7 @@ fn main() {
 
     println!("P3\n{} {}\n255", image_width, image_height);
 
-    let world: Box<dyn Hittable> =
-        Box::new(BvhNode::new_with_list(&mut two_perlin_spheres(), 0.0, 1.0));
-    // let world: Box<dyn Hittable> = Box::new(random_scene());
+    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut earth(), 0.0, 1.0));
 
     let lookfrom = point3!(13, 2, 3);
     let lookat = point3!(0, 0, 0);

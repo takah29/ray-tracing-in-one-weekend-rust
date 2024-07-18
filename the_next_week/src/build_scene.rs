@@ -4,9 +4,10 @@ use crate::{
     moving_sphere::MovingSphere,
     rtweekend::{random, random_range, Color, Point3, Vec3},
     sphere::Sphere,
-    texture::{CheckerTexture, NoiseTexture, SolidColor},
+    texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColor},
     {color, point3, vec3},
 };
+use std::path::Path;
 use std::rc::Rc;
 
 pub fn random_scene() -> HittableList {
@@ -109,4 +110,12 @@ pub fn two_perlin_spheres() -> HittableList {
     )));
 
     world
+}
+
+pub fn earth() -> HittableList {
+    let image_path = Path::new("./data/earthmap.jpg");
+    let earth_texture = Rc::new(ImageTexture::new(image_path));
+    let earth_surface = Rc::new(Lambertian::new(earth_texture));
+    let globe = Rc::new(Sphere::new(point3!(0, 0, 0), 2.0, earth_surface));
+    return HittableList::new_with_object(globe);
 }

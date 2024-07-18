@@ -38,7 +38,8 @@ impl Hittable for Sphere {
                 rec.t = temp;
                 rec.p = r.clone().at(rec.t);
                 let outward_normal = (rec.p - self.center) / self.radius;
-                rec.set_face_normal(r, &outward_normal);
+                rec.set_face_normal(r, &outward_normal.clone());
+                get_sphere_uv(&outward_normal, &mut rec.u, &mut rec.v);
                 rec.opt_mat_ptr = Some(self.mat_ptr.clone());
                 return true;
             }
@@ -50,7 +51,8 @@ impl Hittable for Sphere {
                 rec.t = temp;
                 rec.p = r.clone().at(rec.t);
                 let outward_normal = (rec.p - self.center) / self.radius;
-                rec.set_face_normal(r, &outward_normal);
+                rec.set_face_normal(r, &outward_normal.clone());
+                get_sphere_uv(&outward_normal, &mut rec.u, &mut rec.v);
                 rec.opt_mat_ptr = Some(self.mat_ptr.clone());
                 return true;
             }
@@ -67,10 +69,32 @@ impl Hittable for Sphere {
     }
 }
 
-#[allow(dead_code)]
 fn get_sphere_uv(p: &Point3, u: &mut f64, v: &mut f64) {
-    let phi = f64::atan2(p.e[2], p.e[0]);
-    let theta = p.e[1].sin();
-    *u = 1.0 - (phi + PI) / (2.0 * PI);
-    *v = (theta + PI / 2.0) / PI;
+    let theta = (-p.e[1]).acos();
+    let phi = f64::atan2(-p.e[2], p.e[0]) + PI;
+
+    *u = phi / (2.0 * PI);
+    *v = theta / PI;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_sphere_uv() {
+        let test_cases = vec![
+            (vec3!(1, 0, 0), 0.5, 0.5),
+            (vec3!(0, 1, 0), 0.5, 1.0),
+            (vec3!(0, 0, 1), 0.25, 0.5),
+        ];
+
+        for (p, u_exp, v_exp) in test_cases {
+            let mut u_res = 0.0;
+            let mut v_res = 0.0;
+            get_sphere_uv(&p, &mut u_res, &mut v_res);
+            assert_eq!(u_res, u_exp, "Failed u_res for input: '{:?}", p);
+            assert_eq!(v_res, v_exp, "Failed v_res for input: '{:?}", p);
+        }
+    }
 }
