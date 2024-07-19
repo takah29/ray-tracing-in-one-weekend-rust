@@ -1,3 +1,4 @@
+use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use the_next_week::{
     build_scene::cornell_box,
@@ -72,6 +73,16 @@ fn main() {
         1.0,
     );
 
+    let pb = ProgressBar::new(image_height as u64);
+    pb.set_style(
+        ProgressStyle::default_bar()
+            .template(
+                "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} ({eta})",
+            )
+            .unwrap()
+            .progress_chars("#>-"),
+    );
+
     let pixels = (0..image_height)
         .into_par_iter()
         .rev()
@@ -88,10 +99,13 @@ fn main() {
                 }
                 row_data[i] = pixel_color / samples_per_pixel as f64;
             }
+            pb.inc(1);
             row_data
         })
         .collect();
+    pb.finish();
 
+    eprint!("Write PPM ...");
     write_ppm(pixels, image_width, image_height);
-    eprintln!("\nDone");
+    eprintln!(" Done.");
 }
