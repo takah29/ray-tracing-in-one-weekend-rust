@@ -1,5 +1,5 @@
 use crate::{
-    aarect::XyRect,
+    aarect::{XyRect, XzRect, YzRect},
     hittable_list::HittableList,
     material::{Dielectric, DiffuseLight, Lambertian, Metal},
     moving_sphere::MovingSphere,
@@ -150,6 +150,55 @@ pub fn simple_light() -> HittableList {
         3.0,
         -2.0,
         difflight.clone(),
+    )));
+
+    world
+}
+
+pub fn cornell_box() -> HittableList {
+    let mut world = HittableList::new();
+
+    let red = Rc::new(Lambertian::new(Rc::new(SolidColor::new(color!(
+        0.65, 0.05, 0.05
+    )))));
+    let white = Rc::new(Lambertian::new(Rc::new(SolidColor::new(color!(
+        0.73, 0.73, 0.73
+    )))));
+    let green = Rc::new(Lambertian::new(Rc::new(SolidColor::new(color!(
+        0.12, 0.45, 0.15
+    )))));
+    let light = Rc::new(DiffuseLight::new(Rc::new(SolidColor::new(color!(
+        15, 15, 15
+    )))));
+
+    world.add(Rc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    world.add(Rc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
+    world.add(Rc::new(XzRect::new(
+        213.0, 343.0, 227.0, 332.0, 554.0, light,
+    )));
+    world.add(Rc::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        white.clone(),
+    )));
+    world.add(Rc::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+    world.add(Rc::new(XyRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
     )));
 
     world
