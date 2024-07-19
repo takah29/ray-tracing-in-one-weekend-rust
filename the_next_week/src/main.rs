@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use the_next_week::{
     build_scene::cornell_box,
     bvh::BvhNode,
@@ -7,7 +8,7 @@ use the_next_week::{
     point3,
     ray::Ray,
     rtweekend::{random, Color, Point3, Vec3, INFINITY},
-    utils::write_color,
+    utils::write_ppm,
     vec3,
 };
 
@@ -45,12 +46,10 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
 fn main() {
     let aspect_ratio = 1.0;
     let image_width = 500;
-    let image_height = (image_width as f64 / aspect_ratio) as i32;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
     let samples_per_pixel = 200;
     let max_depth = 50;
     let background = color!(0, 0, 0);
-
-    println!("P3\n{} {}\n255", image_width, image_height);
 
     let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut cornell_box(), 0.0, 1.0));
 
@@ -73,19 +72,26 @@ fn main() {
         1.0,
     );
 
-    for j in (0..image_height).rev() {
-        eprint!("\rScanline remaining: {:3}", j);
-        for i in 0..image_width {
-            let mut pixel_color = color!(0, 0, 0);
-            for _ in 0..samples_per_pixel {
-                let u = (i as f64 + random()) / (image_width - 1) as f64;
-                let v = (j as f64 + random()) / (image_height - 1) as f64;
-                let r = cam.get_ray(u, v);
+    let pixels = (0..image_height)
+        .into_par_iter()
+        .rev()
+        .flat_map(|j| {
+            let mut row_data = vec![color!(0, 0, 0); image_width];
+            for i in 0..image_width {
+                let mut pixel_color = color!(0, 0, 0);
+                for _ in 0..samples_per_pixel {
+                    let u = (i as f64 + random()) / (image_width - 1) as f64;
+                    let v = (j as f64 + random()) / (image_height - 1) as f64;
+                    let r = cam.get_ray(u, v);
 
-                pixel_color += ray_color(r, &background, &world, max_depth);
+                    pixel_color += ray_color(r, &background, &world, max_depth);
+                }
+                row_data[i] = pixel_color / samples_per_pixel as f64;
             }
-            write_color(pixel_color, samples_per_pixel);
-        }
-    }
+            row_data
+        })
+        .collect();
+
+    write_ppm(pixels, image_width, image_height);
     eprintln!("\nDone");
 }

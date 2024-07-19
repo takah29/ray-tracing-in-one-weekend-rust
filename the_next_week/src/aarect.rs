@@ -5,7 +5,7 @@ use crate::{
     rtweekend::{Point3, Ray, Vec3},
     {point3, vec3},
 };
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct XyRect {
     x0: f64,
@@ -13,11 +13,11 @@ pub struct XyRect {
     y0: f64,
     y1: f64,
     k: f64,
-    mat_ptr: Rc<dyn Material>,
+    mat_ptr: Arc<dyn Material>,
 }
 
 impl XyRect {
-    pub fn new(x0: f64, x1: f64, y0: f64, y1: f64, k: f64, mat_ptr: Rc<dyn Material>) -> Self {
+    pub fn new(x0: f64, x1: f64, y0: f64, y1: f64, k: f64, mat_ptr: Arc<dyn Material>) -> Self {
         Self {
             x0,
             x1,
@@ -66,11 +66,11 @@ pub struct XzRect {
     z0: f64,
     z1: f64,
     k: f64,
-    mat_ptr: Rc<dyn Material>,
+    mat_ptr: Arc<dyn Material>,
 }
 
 impl XzRect {
-    pub fn new(x0: f64, x1: f64, z0: f64, z1: f64, k: f64, mat_ptr: Rc<dyn Material>) -> Self {
+    pub fn new(x0: f64, x1: f64, z0: f64, z1: f64, k: f64, mat_ptr: Arc<dyn Material>) -> Self {
         Self {
             x0,
             x1,
@@ -119,11 +119,11 @@ pub struct YzRect {
     z0: f64,
     z1: f64,
     k: f64,
-    mat_ptr: Rc<dyn Material>,
+    mat_ptr: Arc<dyn Material>,
 }
 
 impl YzRect {
-    pub fn new(y0: f64, y1: f64, z0: f64, z1: f64, k: f64, mat_ptr: Rc<dyn Material>) -> Self {
+    pub fn new(y0: f64, y1: f64, z0: f64, z1: f64, k: f64, mat_ptr: Arc<dyn Material>) -> Self {
         Self {
             y0,
             y1,

@@ -3,7 +3,7 @@ use crate::{
     material::Material,
     rtweekend::{Point3, Ray, Vec3},
 };
-use std::rc::Rc;
+use std::sync::Arc;
 
 #[derive(Default, Clone)]
 pub struct HitRecord {
@@ -13,7 +13,7 @@ pub struct HitRecord {
     pub u: f64,
     pub v: f64,
     pub front_face: bool,
-    pub opt_mat_ptr: Option<Rc<dyn Material>>,
+    pub opt_mat_ptr: Option<Arc<dyn Material>>,
 }
 
 impl HitRecord {
@@ -27,7 +27,7 @@ impl HitRecord {
     }
 }
 
-pub trait Hittable {
+pub trait Hittable: Sync + Send {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
     fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut AABB) -> bool;
 }

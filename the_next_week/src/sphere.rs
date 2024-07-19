@@ -3,16 +3,16 @@ use crate::hittable::{HitRecord, Hittable};
 use crate::material::Material;
 use crate::rtweekend::{Point3, Ray, Vec3, PI};
 use crate::vec3;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
-    pub mat_ptr: Rc<dyn Material>,
+    pub mat_ptr: Arc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, mat_ptr: Rc<dyn Material>) -> Self {
+    pub fn new(center: Point3, radius: f64, mat_ptr: Arc<dyn Material>) -> Self {
         Self {
             center,
             radius,

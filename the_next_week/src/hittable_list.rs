@@ -1,10 +1,10 @@
 use crate::aabb::{surrounding_box, AABB};
 use crate::hittable::{HitRecord, Hittable};
 use crate::rtweekend::Ray;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct HittableList {
-    pub objects: Vec<Rc<dyn Hittable>>,
+    pub objects: Vec<Arc<dyn Hittable>>,
 }
 
 impl HittableList {
@@ -14,13 +14,13 @@ impl HittableList {
         }
     }
 
-    pub fn new_with_object(object: Rc<dyn Hittable>) -> Self {
+    pub fn new_with_object(object: Arc<dyn Hittable>) -> Self {
         let mut list = Self::new();
         list.add(object);
         list
     }
 
-    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+    pub fn add(&mut self, object: Arc<dyn Hittable>) {
         self.objects.push(object);
     }
 

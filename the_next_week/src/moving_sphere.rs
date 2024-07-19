@@ -3,7 +3,7 @@ use crate::hittable::{HitRecord, Hittable};
 use crate::material::Material;
 use crate::rtweekend::{Point3, Ray, Vec3};
 use crate::vec3;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct MovingSphere {
     center0: Point3,
@@ -11,7 +11,7 @@ pub struct MovingSphere {
     time0: f64,
     time1: f64,
     radius: f64,
-    mat_ptr: Rc<dyn Material>,
+    mat_ptr: Arc<dyn Material>,
 }
 
 impl MovingSphere {
@@ -21,7 +21,7 @@ impl MovingSphere {
         time0: f64,
         time1: f64,
         radius: f64,
-        mat_ptr: Rc<dyn Material>,
+        mat_ptr: Arc<dyn Material>,
     ) -> Self {
         Self {
             center0,

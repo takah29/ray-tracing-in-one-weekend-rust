@@ -9,17 +9,17 @@ use crate::{
     {color, point3, vec3},
 };
 use std::path::Path;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub fn random_scene() -> HittableList {
     let mut world = HittableList::new();
 
-    let checker = Rc::new(CheckerTexture::new(
-        Rc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
-        Rc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
+    let checker = Arc::new(CheckerTexture::new(
+        Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
+        Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
     ));
-    let ground_material = Rc::new(Lambertian::new(checker));
-    world.add(Rc::new(Sphere::new(
+    let ground_material = Arc::new(Lambertian::new(checker));
+    world.add(Arc::new(Sphere::new(
         point3!(0, -1000, 0),
         1000.0,
         ground_material,
@@ -35,9 +35,9 @@ pub fn random_scene() -> HittableList {
                     // diffuse
                     let albedo = Color::random() * Color::random();
                     let sphere_material =
-                        Rc::new(Lambertian::new(Rc::new(SolidColor::new(albedo))));
+                        Arc::new(Lambertian::new(Arc::new(SolidColor::new(albedo))));
                     let center2 = center + vec3!(0, random_range(0.0, 0.5), 0);
-                    world.add(Rc::new(MovingSphere::new(
+                    world.add(Arc::new(MovingSphere::new(
                         center,
                         center2,
                         0.0,
@@ -49,25 +49,25 @@ pub fn random_scene() -> HittableList {
                     // metal
                     let albedo = Color::random_range(0.5, 1.0);
                     let fuzz = random();
-                    let sphere_material = Rc::new(Metal::new(&albedo, fuzz));
-                    world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
+                    let sphere_material = Arc::new(Metal::new(&albedo, fuzz));
+                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
                     // grass
-                    let sphere_material = Rc::new(Dielectric::new(1.5));
-                    world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
+                    let sphere_material = Arc::new(Dielectric::new(1.5));
+                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 };
             }
         }
     }
 
-    let material1 = Rc::new(Dielectric::new(1.5));
-    world.add(Rc::new(Sphere::new(point3!(0, 1, 0), 1.0, material1)));
-    let material2 = Rc::new(Lambertian::new(Rc::new(SolidColor::new(color!(
+    let material1 = Arc::new(Dielectric::new(1.5));
+    world.add(Arc::new(Sphere::new(point3!(0, 1, 0), 1.0, material1)));
+    let material2 = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
         0.4, 0.2, 0.1
     )))));
-    world.add(Rc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material2)));
-    let material3 = Rc::new(Metal::new(&color!(0.7, 0.6, 0.5), 0.0));
-    world.add(Rc::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));
+    world.add(Arc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material2)));
+    let material3 = Arc::new(Metal::new(&color!(0.7, 0.6, 0.5), 0.0));
+    world.add(Arc::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));
 
     world
 }
@@ -75,20 +75,20 @@ pub fn random_scene() -> HittableList {
 pub fn two_spheres() -> HittableList {
     let mut world = HittableList::new();
 
-    let checker = Rc::new(CheckerTexture::new(
-        Rc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
-        Rc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
+    let checker = Arc::new(CheckerTexture::new(
+        Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
+        Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
     ));
 
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         point3!(0, -10, 0),
         10.0,
-        Rc::new(Lambertian::new(checker.clone())),
+        Arc::new(Lambertian::new(checker.clone())),
     )));
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         point3!(0, 10, 0),
         10.0,
-        Rc::new(Lambertian::new(checker.clone())),
+        Arc::new(Lambertian::new(checker.clone())),
     )));
 
     world
@@ -97,17 +97,17 @@ pub fn two_spheres() -> HittableList {
 pub fn two_perlin_spheres() -> HittableList {
     let mut world = HittableList::new();
 
-    let pertext = Rc::new(NoiseTexture::new(5.0));
+    let pertext = Arc::new(NoiseTexture::new(5.0));
 
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         point3!(0, -1000, 0),
         1000.0,
-        Rc::new(Lambertian::new(pertext.clone())),
+        Arc::new(Lambertian::new(pertext.clone())),
     )));
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         point3!(0, 2, 0),
         2.0,
-        Rc::new(Lambertian::new(pertext.clone())),
+        Arc::new(Lambertian::new(pertext.clone())),
     )));
 
     world
@@ -115,35 +115,37 @@ pub fn two_perlin_spheres() -> HittableList {
 
 pub fn earth() -> HittableList {
     let image_path = Path::new("./data/earthmap.jpg");
-    let earth_texture = Rc::new(ImageTexture::new(image_path));
-    let earth_surface = Rc::new(Lambertian::new(earth_texture));
-    let globe = Rc::new(Sphere::new(point3!(0, 0, 0), 2.0, earth_surface));
+    let earth_texture = Arc::new(ImageTexture::new(image_path));
+    let earth_surface = Arc::new(Lambertian::new(earth_texture));
+    let globe = Arc::new(Sphere::new(point3!(0, 0, 0), 2.0, earth_surface));
     return HittableList::new_with_object(globe);
 }
 
 pub fn simple_light() -> HittableList {
     let mut world = HittableList::new();
 
-    let pertext = Rc::new(NoiseTexture::new(4.0));
-    world.add(Rc::new(Sphere::new(
+    let pertext = Arc::new(NoiseTexture::new(4.0));
+    world.add(Arc::new(Sphere::new(
         point3!(0, -1000, 0),
         1000.0,
-        Rc::new(Lambertian::new(pertext.clone())),
+        Arc::new(Lambertian::new(pertext.clone())),
     )));
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         point3!(0, 2, 0),
         2.0,
-        Rc::new(Lambertian::new(pertext.clone())),
+        Arc::new(Lambertian::new(pertext.clone())),
     )));
 
-    let difflight = Rc::new(DiffuseLight::new(Rc::new(SolidColor::new(color!(4, 4, 4)))));
+    let difflight = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
+        4, 4, 4
+    )))));
 
-    world.add(Rc::new(Sphere::new(
+    world.add(Arc::new(Sphere::new(
         point3!(0, 7, 0),
         2.0,
         difflight.clone(),
     )));
-    world.add(Rc::new(XyRect::new(
+    world.add(Arc::new(XyRect::new(
         3.0,
         5.0,
         1.0,
@@ -158,25 +160,25 @@ pub fn simple_light() -> HittableList {
 pub fn cornell_box() -> HittableList {
     let mut world = HittableList::new();
 
-    let red = Rc::new(Lambertian::new(Rc::new(SolidColor::new(color!(
+    let red = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
         0.65, 0.05, 0.05
     )))));
-    let white = Rc::new(Lambertian::new(Rc::new(SolidColor::new(color!(
+    let white = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
         0.73, 0.73, 0.73
     )))));
-    let green = Rc::new(Lambertian::new(Rc::new(SolidColor::new(color!(
+    let green = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
         0.12, 0.45, 0.15
     )))));
-    let light = Rc::new(DiffuseLight::new(Rc::new(SolidColor::new(color!(
+    let light = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
         15, 15, 15
     )))));
 
-    world.add(Rc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
-    world.add(Rc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
-    world.add(Rc::new(XzRect::new(
+    world.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    world.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
+    world.add(Arc::new(XzRect::new(
         213.0, 343.0, 227.0, 332.0, 554.0, light,
     )));
-    world.add(Rc::new(XzRect::new(
+    world.add(Arc::new(XzRect::new(
         0.0,
         555.0,
         0.0,
@@ -184,7 +186,7 @@ pub fn cornell_box() -> HittableList {
         0.0,
         white.clone(),
     )));
-    world.add(Rc::new(XzRect::new(
+    world.add(Arc::new(XzRect::new(
         0.0,
         555.0,
         0.0,
@@ -192,7 +194,7 @@ pub fn cornell_box() -> HittableList {
         555.0,
         white.clone(),
     )));
-    world.add(Rc::new(XyRect::new(
+    world.add(Arc::new(XyRect::new(
         0.0,
         555.0,
         0.0,

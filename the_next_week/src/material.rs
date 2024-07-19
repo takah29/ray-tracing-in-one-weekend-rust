@@ -3,9 +3,9 @@ use crate::hittable::HitRecord;
 use crate::rtweekend::{random, Color, Point3, Ray};
 use crate::texture::Texture;
 use crate::vec3::{random_in_unit_sphere, random_unit_vector, reflect, refract};
-use std::rc::Rc;
+use std::sync::Arc;
 
-pub trait Material {
+pub trait Material: Sync + Send {
     fn scatter(
         &self,
         r_in: &Ray,
@@ -20,11 +20,11 @@ pub trait Material {
 }
 
 pub struct Lambertian {
-    albedo: Rc<dyn Texture>,
+    albedo: Arc<dyn Texture>,
 }
 
 impl Lambertian {
-    pub fn new(albedo: Rc<dyn Texture>) -> Self {
+    pub fn new(albedo: Arc<dyn Texture>) -> Self {
         Self { albedo }
     }
 }
@@ -123,11 +123,11 @@ impl Material for Dielectric {
 }
 
 pub struct DiffuseLight {
-    emit: Rc<dyn Texture>,
+    emit: Arc<dyn Texture>,
 }
 
 impl DiffuseLight {
-    pub fn new(emit: Rc<dyn Texture>) -> Self {
+    pub fn new(emit: Arc<dyn Texture>) -> Self {
         Self { emit }
     }
 }

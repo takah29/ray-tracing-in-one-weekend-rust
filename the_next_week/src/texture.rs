@@ -5,9 +5,9 @@ use crate::{
 };
 use image::Rgb32FImage;
 use std::path::Path;
-use std::rc::Rc;
+use std::sync::Arc;
 
-pub trait Texture {
+pub trait Texture: Sync + Send {
     fn value(&self, u: f64, v: f64, p: &Point3) -> Color;
 }
 pub struct SolidColor {
@@ -27,12 +27,12 @@ impl Texture for SolidColor {
 }
 
 pub struct CheckerTexture {
-    even: Rc<dyn Texture>,
-    odd: Rc<dyn Texture>,
+    even: Arc<dyn Texture>,
+    odd: Arc<dyn Texture>,
 }
 
 impl CheckerTexture {
-    pub fn new(even: Rc<dyn Texture>, odd: Rc<dyn Texture>) -> Self {
+    pub fn new(even: Arc<dyn Texture>, odd: Arc<dyn Texture>) -> Self {
         Self { even, odd }
     }
 }
