@@ -1,6 +1,7 @@
 use crate::{
+    aarect::XyRect,
     hittable_list::HittableList,
-    material::{Dielectric, Lambertian, Metal},
+    material::{Dielectric, DiffuseLight, Lambertian, Metal},
     moving_sphere::MovingSphere,
     rtweekend::{random, random_range, Color, Point3, Vec3},
     sphere::Sphere,
@@ -118,4 +119,38 @@ pub fn earth() -> HittableList {
     let earth_surface = Rc::new(Lambertian::new(earth_texture));
     let globe = Rc::new(Sphere::new(point3!(0, 0, 0), 2.0, earth_surface));
     return HittableList::new_with_object(globe);
+}
+
+pub fn simple_light() -> HittableList {
+    let mut world = HittableList::new();
+
+    let pertext = Rc::new(NoiseTexture::new(4.0));
+    world.add(Rc::new(Sphere::new(
+        point3!(0, -1000, 0),
+        1000.0,
+        Rc::new(Lambertian::new(pertext.clone())),
+    )));
+    world.add(Rc::new(Sphere::new(
+        point3!(0, 2, 0),
+        2.0,
+        Rc::new(Lambertian::new(pertext.clone())),
+    )));
+
+    let difflight = Rc::new(DiffuseLight::new(Rc::new(SolidColor::new(color!(4, 4, 4)))));
+
+    world.add(Rc::new(Sphere::new(
+        point3!(0, 7, 0),
+        2.0,
+        difflight.clone(),
+    )));
+    world.add(Rc::new(XyRect::new(
+        3.0,
+        5.0,
+        1.0,
+        3.0,
+        -2.0,
+        difflight.clone(),
+    )));
+
+    world
 }

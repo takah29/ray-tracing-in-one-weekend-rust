@@ -1,5 +1,5 @@
 use the_next_week::{
-    build_scene::earth,
+    build_scene::simple_light,
     bvh::BvhNode,
     camera::Camera,
     color,
@@ -39,23 +39,23 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
         return emitted;
     }
 
-    emitted + attenuation * ray_color(r, background, world, depth - 1)
+    emitted + attenuation * ray_color(scattered, background, world, depth - 1)
 }
 
 fn main() {
     let aspect_ratio = 16.0 / 9.0;
-    let image_width = 384;
+    let image_width = 640;
     let image_height = (image_width as f64 / aspect_ratio) as i32;
-    let samples_per_pixel = 20;
+    let samples_per_pixel = 100;
     let max_depth = 50;
     let background = color!(0, 0, 0);
 
     println!("P3\n{} {}\n255", image_width, image_height);
 
-    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut earth(), 0.0, 1.0));
+    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut simple_light(), 0.0, 1.0));
 
-    let lookfrom = point3!(13, 2, 3);
-    let lookat = point3!(0, 0, 0);
+    let lookfrom = point3!(20, 5, 5);
+    let lookat = point3!(0, 2, 0);
     let vup = vec3!(0, 1, 0);
     let dist_to_focus = 10.0;
     let aperture = 0.0;
