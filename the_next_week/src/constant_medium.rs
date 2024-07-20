@@ -69,7 +69,7 @@ impl Hittable for ConstantMedium {
         }
 
         rec.t = rec1.t + hit_distance / ray_length;
-        rec.p = r.clone().at(rec.t);
+        rec.p = r.at(rec.t);
 
         if debugging {
             eprintln!(

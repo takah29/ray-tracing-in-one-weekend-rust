@@ -20,7 +20,7 @@ impl Ray {
         Self { orig, dir, time }
     }
 
-    pub fn at(self, t: f64) -> Point3 {
+    pub fn at(&self, t: f64) -> Point3 {
         self.orig + t * self.dir
     }
 }

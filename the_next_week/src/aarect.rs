@@ -46,7 +46,7 @@ impl Hittable for XyRect {
         let outward_normal = vec3!(0, 0, 1);
         rec.set_face_normal(r, &outward_normal);
         rec.opt_mat_ptr = Some(self.mat_ptr.clone());
-        rec.p = r.clone().at(t);
+        rec.p = r.at(t);
 
         true
     }
@@ -99,7 +99,7 @@ impl Hittable for XzRect {
         let outward_normal = vec3!(0, 1, 0);
         rec.set_face_normal(r, &outward_normal);
         rec.opt_mat_ptr = Some(self.mat_ptr.clone());
-        rec.p = r.clone().at(t);
+        rec.p = r.at(t);
 
         true
     }
@@ -152,7 +152,7 @@ impl Hittable for YzRect {
         let outward_normal = vec3!(1, 0, 0);
         rec.set_face_normal(r, &outward_normal);
         rec.opt_mat_ptr = Some(self.mat_ptr.clone());
-        rec.p = r.clone().at(t);
+        rec.p = r.at(t);
 
         true
     }

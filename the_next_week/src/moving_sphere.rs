@@ -54,7 +54,7 @@ impl Hittable for MovingSphere {
             // 値が小さい方のt
             if t_min < temp && temp < t_max {
                 rec.t = temp;
-                rec.p = r.clone().at(rec.t);
+                rec.p = r.at(rec.t);
                 let outward_normal = (rec.p - self.center(r.time)) / self.radius;
                 rec.set_face_normal(r, &outward_normal);
                 rec.opt_mat_ptr = Some(self.mat_ptr.clone());
@@ -66,7 +66,7 @@ impl Hittable for MovingSphere {
             // 値が大きい方のt
             if t_min < temp && temp < t_max {
                 rec.t = temp;
-                rec.p = r.clone().at(rec.t);
+                rec.p = r.at(rec.t);
                 let outward_normal = (rec.p - self.center(r.time)) / self.radius;
                 rec.set_face_normal(r, &outward_normal);
                 rec.opt_mat_ptr = Some(self.mat_ptr.clone());

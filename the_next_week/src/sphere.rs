@@ -36,7 +36,7 @@ impl Hittable for Sphere {
             // 値が小さい方のt
             if t_min < temp && temp < t_max {
                 rec.t = temp;
-                rec.p = r.clone().at(rec.t);
+                rec.p = r.at(rec.t);
                 let outward_normal = (rec.p - self.center) / self.radius;
                 rec.set_face_normal(r, &outward_normal.clone());
                 get_sphere_uv(&outward_normal, &mut rec.u, &mut rec.v);
@@ -49,7 +49,7 @@ impl Hittable for Sphere {
             // 値が大きい方のt
             if t_min < temp && temp < t_max {
                 rec.t = temp;
-                rec.p = r.clone().at(rec.t);
+                rec.p = r.at(rec.t);
                 let outward_normal = (rec.p - self.center) / self.radius;
                 rec.set_face_normal(r, &outward_normal.clone());
                 get_sphere_uv(&outward_normal, &mut rec.u, &mut rec.v);
