@@ -1,8 +1,10 @@
-use crate::color;
-use crate::hittable::HitRecord;
-use crate::rtweekend::{random, Color, Point3, Ray};
-use crate::texture::Texture;
-use crate::vec3::{random_in_unit_sphere, random_unit_vector, reflect, refract};
+use crate::{
+    color,
+    hittable::HitRecord,
+    rtweekend::{random, Color, Point3, Ray},
+    texture::Texture,
+    vec3::{random_in_unit_sphere, random_unit_vector, reflect, refract},
+};
 use std::sync::Arc;
 
 pub trait Material: Sync + Send {
@@ -151,4 +153,29 @@ impl Material for DiffuseLight {
 fn schlick(cosine: f64, ref_idx: f64) -> f64 {
     let r0 = ((1.0 - ref_idx) / (1.0 + ref_idx)).powi(2);
     return r0 + (1.0 - r0) * (1.0 - cosine).powi(5);
+}
+
+pub struct Isotropic {
+    albedo: Arc<dyn Texture>,
+}
+
+impl Isotropic {
+    pub fn new(albedo: Arc<dyn Texture>) -> Self {
+        Self { albedo }
+    }
+}
+
+impl Material for Isotropic {
+    fn scatter(
+        &self,
+        r_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool {
+        *scattered = Ray::new_with_time(rec.p, random_in_unit_sphere(), r_in.time);
+        *attenuation = self.albedo.value(rec.u, rec.v, &rec.p);
+
+        true
+    }
 }

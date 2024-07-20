@@ -3,6 +3,7 @@ pub mod aarect;
 pub mod build_scene;
 pub mod bvh;
 pub mod camera;
+pub mod constant_medium;
 pub mod cuboid;
 pub mod hittable;
 pub mod hittable_list;
