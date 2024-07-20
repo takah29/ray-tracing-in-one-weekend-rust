@@ -31,3 +31,38 @@ pub trait Hittable: Sync + Send {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
     fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut AABB) -> bool;
 }
+
+pub struct Translate {
+    obj_ptr: Arc<dyn Hittable>,
+    offset: Vec3,
+}
+
+impl Translate {
+    pub fn new(obj_ptr: Arc<dyn Hittable>, offset: Vec3) -> Self {
+        Self { obj_ptr, offset }
+    }
+}
+
+impl Hittable for Translate {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+        let moved_r = Ray::new_with_time(r.orig - self.offset, r.dir, r.time);
+        if !self.obj_ptr.hit(&moved_r, t_min, t_max, rec) {
+            return false;
+        }
+
+        rec.p += self.offset;
+        rec.set_face_normal(&moved_r, &rec.normal.clone());
+
+        true
+    }
+
+    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut AABB) -> bool {
+        if !self.obj_ptr.bounding_box(t0, t1, output_box) {
+            return false;
+        }
+
+        *output_box = AABB::new(output_box.min + self.offset, output_box.max + self.offset);
+
+        true
+    }
+}
