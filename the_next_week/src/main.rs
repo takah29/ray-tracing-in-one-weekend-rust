@@ -3,14 +3,11 @@ use rayon::prelude::*;
 use the_next_week::{
     build_scene::cornell_box,
     bvh::BvhNode,
-    camera::Camera,
     color,
     hittable::{HitRecord, Hittable},
-    point3,
     ray::Ray,
-    rtweekend::{random, Color, Point3, Vec3, INFINITY},
+    rtweekend::{random, Color, INFINITY},
     utils::write_ppm,
-    vec3,
 };
 
 fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) -> Color {
@@ -45,33 +42,12 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
 }
 
 fn main() {
-    let aspect_ratio = 1.0;
-    let image_width = 500;
-    let image_height = (image_width as f64 / aspect_ratio) as usize;
-    let samples_per_pixel = 200;
+    let samples_per_pixel = 100;
     let max_depth = 50;
-    let background = color!(0, 0, 0);
 
-    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut cornell_box(), 0.0, 1.0));
-
-    let lookfrom = point3!(278, 278, -800);
-    let lookat = point3!(278, 278, 0);
-    let vup = vec3!(0, 1, 0);
-    let dist_to_focus = 10.0;
-    let aperture = 0.0;
-    let vfov = 40.0;
-
-    let cam = Camera::new(
-        lookfrom,
-        lookat,
-        vup,
-        vfov,
-        aspect_ratio,
-        aperture,
-        dist_to_focus,
-        0.0,
-        1.0,
-    );
+    let (mut hittable_list, cam, background, image_width, image_height) = cornell_box();
+    // let world: Box<dyn Hittable> = Box::new(hittable_list);
+    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
 
     let pb = ProgressBar::new(image_height as u64);
     pb.set_style(

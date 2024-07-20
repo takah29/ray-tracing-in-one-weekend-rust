@@ -1,5 +1,6 @@
 use crate::{
     aarect::{XyRect, XzRect, YzRect},
+    camera::Camera,
     cuboid::Cuboid,
     hittable::{RotateY, Translate},
     hittable_list::HittableList,
@@ -13,15 +14,15 @@ use crate::{
 use std::path::Path;
 use std::sync::Arc;
 
-pub fn random_scene() -> HittableList {
-    let mut world = HittableList::new();
+pub fn random_scene() -> (HittableList, Camera, Color, usize, usize) {
+    let mut hittable_list = HittableList::new();
 
     let checker = Arc::new(CheckerTexture::new(
         Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
         Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
     ));
     let ground_material = Arc::new(Lambertian::new(checker));
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         point3!(0, -1000, 0),
         1000.0,
         ground_material,
@@ -39,7 +40,7 @@ pub fn random_scene() -> HittableList {
                     let sphere_material =
                         Arc::new(Lambertian::new(Arc::new(SolidColor::new(albedo))));
                     let center2 = center + vec3!(0, random_range(0.0, 0.5), 0);
-                    world.add(Arc::new(MovingSphere::new(
+                    hittable_list.add(Arc::new(MovingSphere::new(
                         center,
                         center2,
                         0.0,
@@ -52,87 +53,190 @@ pub fn random_scene() -> HittableList {
                     let albedo = Color::random_range(0.5, 1.0);
                     let fuzz = random();
                     let sphere_material = Arc::new(Metal::new(&albedo, fuzz));
-                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
+                    hittable_list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
                     // grass
                     let sphere_material = Arc::new(Dielectric::new(1.5));
-                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
+                    hittable_list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 };
             }
         }
     }
 
     let material1 = Arc::new(Dielectric::new(1.5));
-    world.add(Arc::new(Sphere::new(point3!(0, 1, 0), 1.0, material1)));
+    hittable_list.add(Arc::new(Sphere::new(point3!(0, 1, 0), 1.0, material1)));
     let material2 = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
         0.4, 0.2, 0.1
     )))));
-    world.add(Arc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material2)));
+    hittable_list.add(Arc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material2)));
     let material3 = Arc::new(Metal::new(&color!(0.7, 0.6, 0.5), 0.0));
-    world.add(Arc::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));
+    hittable_list.add(Arc::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));
 
-    world
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
+
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
+
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
+
+    (hittable_list, cam, background, image_width, image_height)
 }
 
-pub fn two_spheres() -> HittableList {
-    let mut world = HittableList::new();
+pub fn two_spheres() -> (HittableList, Camera, Color, usize, usize) {
+    let mut hittable_list = HittableList::new();
 
     let checker = Arc::new(CheckerTexture::new(
         Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
         Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
     ));
 
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         point3!(0, -10, 0),
         10.0,
         Arc::new(Lambertian::new(checker.clone())),
     )));
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         point3!(0, 10, 0),
         10.0,
         Arc::new(Lambertian::new(checker.clone())),
     )));
 
-    world
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
+
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
+
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
+
+    (hittable_list, cam, background, image_width, image_height)
 }
 
-pub fn two_perlin_spheres() -> HittableList {
-    let mut world = HittableList::new();
+pub fn two_perlin_spheres() -> (HittableList, Camera, Color, usize, usize) {
+    let mut hittable_list = HittableList::new();
 
     let pertext = Arc::new(NoiseTexture::new(5.0));
 
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         point3!(0, -1000, 0),
         1000.0,
         Arc::new(Lambertian::new(pertext.clone())),
     )));
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         point3!(0, 2, 0),
         2.0,
         Arc::new(Lambertian::new(pertext.clone())),
     )));
 
-    world
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
+
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
+
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
+
+    (hittable_list, cam, background, image_width, image_height)
 }
 
-pub fn earth() -> HittableList {
+pub fn earth() -> (HittableList, Camera, Color, usize, usize) {
     let image_path = Path::new("./data/earthmap.jpg");
     let earth_texture = Arc::new(ImageTexture::new(image_path));
     let earth_surface = Arc::new(Lambertian::new(earth_texture));
     let globe = Arc::new(Sphere::new(point3!(0, 0, 0), 2.0, earth_surface));
-    return HittableList::new_with_object(globe);
+
+    let hittable_list = HittableList::new_with_object(globe);
+
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
+
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
+
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
+
+    (hittable_list, cam, background, image_width, image_height)
 }
 
-pub fn simple_light() -> HittableList {
-    let mut world = HittableList::new();
+pub fn simple_light() -> (HittableList, Camera, Color, usize, usize) {
+    let mut hittable_list = HittableList::new();
 
     let pertext = Arc::new(NoiseTexture::new(4.0));
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         point3!(0, -1000, 0),
         1000.0,
         Arc::new(Lambertian::new(pertext.clone())),
     )));
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         point3!(0, 2, 0),
         2.0,
         Arc::new(Lambertian::new(pertext.clone())),
@@ -142,12 +246,12 @@ pub fn simple_light() -> HittableList {
         4, 4, 4
     )))));
 
-    world.add(Arc::new(Sphere::new(
+    hittable_list.add(Arc::new(Sphere::new(
         point3!(0, 7, 0),
         2.0,
         difflight.clone(),
     )));
-    world.add(Arc::new(XyRect::new(
+    hittable_list.add(Arc::new(XyRect::new(
         3.0,
         5.0,
         1.0,
@@ -156,11 +260,37 @@ pub fn simple_light() -> HittableList {
         difflight.clone(),
     )));
 
-    world
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0, 0, 0);
+
+    let lookfrom = point3!(26, 3, 6);
+    let lookat = point3!(0, 2, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 20.0;
+
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
+
+    (hittable_list, cam, background, image_width, image_height)
 }
 
-pub fn cornell_box() -> HittableList {
-    let mut world = HittableList::new();
+pub fn cornell_box() -> (HittableList, Camera, Color, usize, usize) {
+    // オブジェクトの設定
+    let mut hittable_list = HittableList::new();
 
     let red = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
         0.65, 0.05, 0.05
@@ -175,12 +305,12 @@ pub fn cornell_box() -> HittableList {
         15, 15, 15
     )))));
 
-    world.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
-    world.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
-    world.add(Arc::new(XzRect::new(
+    hittable_list.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    hittable_list.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
+    hittable_list.add(Arc::new(XzRect::new(
         213.0, 343.0, 227.0, 332.0, 554.0, light,
     )));
-    world.add(Arc::new(XzRect::new(
+    hittable_list.add(Arc::new(XzRect::new(
         0.0,
         555.0,
         0.0,
@@ -188,7 +318,7 @@ pub fn cornell_box() -> HittableList {
         0.0,
         white.clone(),
     )));
-    world.add(Arc::new(XzRect::new(
+    hittable_list.add(Arc::new(XzRect::new(
         0.0,
         555.0,
         0.0,
@@ -196,7 +326,7 @@ pub fn cornell_box() -> HittableList {
         555.0,
         white.clone(),
     )));
-    world.add(Arc::new(XyRect::new(
+    hittable_list.add(Arc::new(XyRect::new(
         0.0,
         555.0,
         0.0,
@@ -212,7 +342,7 @@ pub fn cornell_box() -> HittableList {
     ));
     let box1 = Arc::new(RotateY::new(box1, 15.0));
     let box1 = Arc::new(Translate::new(box1, vec3!(265, 0, 295)));
-    world.add(box1);
+    hittable_list.add(box1);
 
     let box2 = Arc::new(Cuboid::new(
         point3!(0, 0, 0),
@@ -221,7 +351,32 @@ pub fn cornell_box() -> HittableList {
     ));
     let box2 = Arc::new(RotateY::new(box2, -18.0));
     let box2 = Arc::new(Translate::new(box2, vec3!(130, 0, 65)));
-    world.add(box2);
+    hittable_list.add(box2);
 
-    world
+    // カメラの設定
+    let aspect_ratio = 1.0;
+    let image_width = 500;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0, 0, 0);
+
+    let lookfrom = point3!(278, 278, -800);
+    let lookat = point3!(278, 278, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 40.0;
+
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
+
+    (hittable_list, cam, background, image_width, image_height)
 }
