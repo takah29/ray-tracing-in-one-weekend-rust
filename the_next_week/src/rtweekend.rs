@@ -9,10 +9,6 @@ thread_local! {
     static RNG: RefCell<rand::rngs::ThreadRng> = RefCell::new(rand::thread_rng());
 }
 
-pub fn degrees_to_radians(degrees: f64) -> f64 {
-    degrees * PI / 180.0
-}
-
 pub fn random() -> f64 {
     RNG.with(|rng| rng.borrow_mut().gen())
 }
@@ -34,7 +30,7 @@ mod tests {
         let test_cases = vec![(0.0, 0.0), (90.0, PI / 2.0), (180.0, PI)];
 
         for (input, expected) in test_cases {
-            let result = degrees_to_radians(input);
+            let result = (input as f64).to_radians();
             assert_eq!(result, expected, "Failed for input: '{}", input);
         }
     }

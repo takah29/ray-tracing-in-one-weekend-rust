@@ -1,5 +1,5 @@
 use crate::{
-    rtweekend::{degrees_to_radians, random_range, Point3, Ray, Vec3},
+    rtweekend::{random_range, Point3, Ray, Vec3},
     vec3::random_in_unit_disk,
 };
 
@@ -27,7 +27,7 @@ impl Camera {
         time0: f64,
         time1: f64,
     ) -> Self {
-        let theta = degrees_to_radians(vfov);
+        let theta = vfov.to_radians();
         let h = (theta / 2.0).tan();
         let viewport_height = 2.0 * h;
         let viewport_width = aspect_ratio * viewport_height;
