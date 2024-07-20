@@ -12,10 +12,10 @@ impl AABB {
         Self { min, max }
     }
 
-    pub fn new_with_inf() -> Self {
+    pub fn new_with_empty() -> Self {
         Self::new(
-            point3!(-INFINITY, -INFINITY, -INFINITY),
             point3!(INFINITY, INFINITY, INFINITY),
+            point3!(-INFINITY, -INFINITY, -INFINITY),
         )
     }
 

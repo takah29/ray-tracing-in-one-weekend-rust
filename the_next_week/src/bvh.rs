@@ -50,8 +50,8 @@ impl BvhNode {
             }
         };
 
-        let mut box_left = AABB::new_with_inf();
-        let mut box_right = AABB::new_with_inf();
+        let mut box_left = AABB::new_with_empty();
+        let mut box_right = AABB::new_with_empty();
 
         if !left.bounding_box(time0, time1, &mut box_left)
             || !right.bounding_box(time0, time1, &mut box_right)
@@ -91,8 +91,8 @@ impl Hittable for BvhNode {
 }
 
 fn box_compare(a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>, axis: usize) -> Ordering {
-    let mut box_a = AABB::new_with_inf();
-    let mut box_b = AABB::new_with_inf();
+    let mut box_a = AABB::new_with_empty();
+    let mut box_b = AABB::new_with_empty();
 
     if !a.bounding_box(0.0, 0.0, &mut box_a) || !b.bounding_box(0.0, 0.0, &mut box_b) {
         eprintln!("No bounding box in bvh_node constructor.");

@@ -50,7 +50,7 @@ impl Hittable for HittableList {
             return false;
         }
 
-        let mut temp_box = AABB::new_with_inf();
+        let mut temp_box = AABB::new_with_empty();
         let mut first_box = true;
 
         for object in &self.objects {

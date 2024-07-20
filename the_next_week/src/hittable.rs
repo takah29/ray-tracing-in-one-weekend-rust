@@ -82,7 +82,7 @@ impl RotateY {
         let sin_theta = radians.sin();
         let cos_theta = radians.cos();
 
-        let mut bbox = AABB::new_with_inf();
+        let mut bbox = AABB::new_with_empty();
         let hasbox = obj_ptr.bounding_box(0.0, 1.0, &mut bbox);
 
         let mut min = point3!(INFINITY, INFINITY, INFINITY);
