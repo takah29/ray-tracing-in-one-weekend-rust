@@ -1,7 +1,7 @@
 use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use the_next_week::{
-    build_scene::final_scene,
+    build_scene::cornell_box,
     bvh::BvhNode,
     color,
     hittable::{HitRecord, Hittable},
@@ -22,30 +22,40 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
     }
 
     let mut scattered = Ray::default();
-    let mut attenuation = Color::default();
     let emitted = rec
         .opt_mat_ptr
         .as_ref()
         .expect("Material not set")
         .emitted(rec.u, rec.v, &rec.p);
+    let mut pdf = 0.0;
+    let mut albedo = color!(0, 0, 0);
 
     if !rec.opt_mat_ptr.as_ref().expect("Material not set").scatter(
         &r,
         &rec,
-        &mut attenuation,
+        &mut albedo,
         &mut scattered,
+        &mut pdf,
     ) {
         return emitted;
     }
 
-    emitted + attenuation * ray_color(scattered, background, world, depth - 1)
+    emitted
+        + albedo
+            * rec
+                .opt_mat_ptr
+                .as_ref()
+                .expect("Material not set")
+                .scattering_pdf(&r, &rec, &scattered)
+            * ray_color(scattered, background, world, depth - 1)
+            / pdf
 }
 
 fn main() {
     let samples_per_pixel = 100;
-    let max_depth = 10;
+    let max_depth = 20;
 
-    let (mut hittable_list, cam, background, image_width, image_height) = final_scene();
+    let (mut hittable_list, cam, background, image_width, image_height) = cornell_box();
     // let world: Box<dyn Hittable> = Box::new(hittable_list);
     let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
 
