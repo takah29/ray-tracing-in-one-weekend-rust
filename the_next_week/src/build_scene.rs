@@ -1,6 +1,7 @@
 use crate::{
     aarect::{XyRect, XzRect, YzRect},
     cuboid::Cuboid,
+    hittable::{RotateY, Translate},
     hittable_list::HittableList,
     material::{Dielectric, DiffuseLight, Lambertian, Metal},
     moving_sphere::MovingSphere,
@@ -204,16 +205,23 @@ pub fn cornell_box() -> HittableList {
         white.clone(),
     )));
 
-    world.add(Arc::new(Cuboid::new(
-        point3!(130, 0, 65),
-        point3!(295, 165, 230),
+    let box1 = Arc::new(Cuboid::new(
+        point3!(0, 0, 0),
+        point3!(165, 330, 165),
         white.clone(),
-    )));
-    world.add(Arc::new(Cuboid::new(
-        point3!(265, 0, 295),
-        point3!(430, 330, 460),
+    ));
+    let box1 = Arc::new(RotateY::new(box1, 15.0));
+    let box1 = Arc::new(Translate::new(box1, vec3!(265, 0, 295)));
+    world.add(box1);
+
+    let box2 = Arc::new(Cuboid::new(
+        point3!(0, 0, 0),
+        point3!(165, 165, 165),
         white.clone(),
-    )));
+    ));
+    let box2 = Arc::new(RotateY::new(box2, -18.0));
+    let box2 = Arc::new(Translate::new(box2, vec3!(130, 0, 65)));
+    world.add(box2);
 
     world
 }
