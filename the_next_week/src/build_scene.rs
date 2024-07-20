@@ -1,6 +1,7 @@
 use crate::{
     aarect::{XyRect, XzRect, YzRect},
     camera::Camera,
+    constant_medium::ConstantMedium,
     cuboid::Cuboid,
     hittable::{RotateY, Translate},
     hittable_list::HittableList,
@@ -352,6 +353,107 @@ pub fn cornell_box() -> (HittableList, Camera, Color, usize, usize) {
     let box2 = Arc::new(RotateY::new(box2, -18.0));
     let box2 = Arc::new(Translate::new(box2, vec3!(130, 0, 65)));
     hittable_list.add(box2);
+
+    // カメラの設定
+    let aspect_ratio = 1.0;
+    let image_width = 500;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0, 0, 0);
+
+    let lookfrom = point3!(278, 278, -800);
+    let lookat = point3!(278, 278, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 40.0;
+
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
+
+    (hittable_list, cam, background, image_width, image_height)
+}
+
+pub fn cornell_smoke() -> (HittableList, Camera, Color, usize, usize) {
+    // オブジェクトの設定
+    let mut hittable_list = HittableList::new();
+
+    let red = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.65, 0.05, 0.05
+    )))));
+    let white = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.73, 0.73, 0.73
+    )))));
+    let green = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.12, 0.45, 0.15
+    )))));
+    let light = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
+        7, 7, 7
+    )))));
+
+    hittable_list.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    hittable_list.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
+    hittable_list.add(Arc::new(XzRect::new(
+        113.0, 443.0, 127.0, 432.0, 554.0, light,
+    )));
+    hittable_list.add(Arc::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        white.clone(),
+    )));
+    hittable_list.add(Arc::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+    hittable_list.add(Arc::new(XyRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+
+    let box1 = Arc::new(Cuboid::new(
+        point3!(0, 0, 0),
+        point3!(165, 330, 165),
+        white.clone(),
+    ));
+    let box1 = Arc::new(RotateY::new(box1, 15.0));
+    let box1 = Arc::new(Translate::new(box1, vec3!(265, 0, 295)));
+    hittable_list.add(Arc::new(ConstantMedium::new(
+        box1,
+        0.01,
+        Arc::new(SolidColor::new(color!(0, 0, 0))),
+    )));
+
+    let box2 = Arc::new(Cuboid::new(
+        point3!(0, 0, 0),
+        point3!(165, 165, 165),
+        white.clone(),
+    ));
+    let box2 = Arc::new(RotateY::new(box2, -18.0));
+    let box2 = Arc::new(Translate::new(box2, vec3!(130, 0, 65)));
+    hittable_list.add(Arc::new(ConstantMedium::new(
+        box2,
+        0.01,
+        Arc::new(SolidColor::new(color!(1, 1, 1))),
+    )));
 
     // カメラの設定
     let aspect_ratio = 1.0;

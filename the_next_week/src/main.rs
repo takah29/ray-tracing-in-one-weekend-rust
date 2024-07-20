@@ -1,7 +1,7 @@
 use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use the_next_week::{
-    build_scene::cornell_box,
+    build_scene::cornell_smoke,
     bvh::BvhNode,
     color,
     hittable::{HitRecord, Hittable},
@@ -45,7 +45,7 @@ fn main() {
     let samples_per_pixel = 100;
     let max_depth = 50;
 
-    let (mut hittable_list, cam, background, image_width, image_height) = cornell_box();
+    let (mut hittable_list, cam, background, image_width, image_height) = cornell_smoke();
     // let world: Box<dyn Hittable> = Box::new(hittable_list);
     let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
 
