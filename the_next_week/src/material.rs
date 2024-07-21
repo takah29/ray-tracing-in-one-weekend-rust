@@ -1,9 +1,10 @@
 use crate::{
     color,
     hittable::HitRecord,
+    onb::Onb,
     rtweekend::{random, Color, Point3, Ray, PI},
     texture::Texture,
-    vec3::{random_in_hemisphere, random_in_unit_sphere, reflect, refract},
+    vec3::{random_cosine_direction, random_in_unit_sphere, reflect, refract},
 };
 use std::sync::Arc;
 
@@ -47,10 +48,11 @@ impl Material for Lambertian {
         scattered: &mut Ray,
         pdf: &mut f64,
     ) -> bool {
-        let direction = random_in_hemisphere(rec.normal);
+        let uvw = Onb::build_from_w(rec.normal);
+        let direction = uvw.local_vec3(random_cosine_direction());
         *scattered = Ray::new_with_time(rec.p, direction.unit(), r_in.time);
         *albedo = self.albedo.value(rec.u, rec.v, &rec.p);
-        *pdf = 0.5 / PI;
+        *pdf = uvw.w().dot(scattered.dir) / PI;
         true
     }
 
