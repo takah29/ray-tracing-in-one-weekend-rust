@@ -1,0 +1,13 @@
+[package]
+name = "the_rest_of_your_life"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+image = { version = "0.25.1", default-features = false, features = [
+    "png",
+    "jpeg",
+] }
+indicatif = "0.17.8"
+rand = "0.8.5"
+rayon = "1.10.0"
