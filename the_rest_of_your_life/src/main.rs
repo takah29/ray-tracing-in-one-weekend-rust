@@ -27,7 +27,7 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
         .opt_mat_ptr
         .as_ref()
         .expect("Material not set")
-        .emitted(rec.u, rec.v, &rec.p);
+        .emitted(&rec, rec.u, rec.v, &rec.p);
     let mut pdf = 0.0;
     let mut albedo = color!(0, 0, 0);
 
@@ -75,7 +75,7 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
 }
 
 fn main() {
-    let samples_per_pixel = 100;
+    let samples_per_pixel = 10;
     let max_depth = 20;
 
     let (mut hittable_list, cam, background, image_width, image_height) = cornell_box();

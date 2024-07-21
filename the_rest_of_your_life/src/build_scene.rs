@@ -4,7 +4,7 @@ use crate::{
     camera::Camera,
     constant_medium::ConstantMedium,
     cuboid::Cuboid,
-    hittable::{RotateY, Translate},
+    hittable::{FlipFace, RotateY, Translate},
     hittable_list::HittableList,
     material::{Dielectric, DiffuseLight, Lambertian, Metal},
     moving_sphere::MovingSphere,
@@ -309,9 +309,9 @@ pub fn cornell_box() -> (HittableList, Camera, Color, usize, usize) {
 
     hittable_list.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
     hittable_list.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
-    hittable_list.add(Arc::new(XzRect::new(
+    hittable_list.add(Arc::new(FlipFace::new(Arc::new(XzRect::new(
         213.0, 343.0, 227.0, 332.0, 554.0, light,
-    )));
+    )))));
     hittable_list.add(Arc::new(XzRect::new(
         0.0,
         555.0,
