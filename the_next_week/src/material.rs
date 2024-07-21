@@ -1,28 +1,20 @@
 use crate::{
     color,
     hittable::HitRecord,
-    onb::Onb,
-    rtweekend::{random, Color, Point3, Ray, PI},
+    rtweekend::{random, Color, Point3, Ray},
     texture::Texture,
-    vec3::{random_cosine_direction, random_in_unit_sphere, reflect, refract},
+    vec3::{random_in_unit_sphere, random_unit_vector, reflect, refract},
 };
 use std::sync::Arc;
 
 pub trait Material: Sync + Send {
     fn scatter(
         &self,
-        _r_in: &Ray,
-        _rec: &HitRecord,
-        _albedo: &mut Color,
-        _scattered: &mut Ray,
-        _pdf: &mut f64,
-    ) -> bool {
-        false
-    }
-
-    fn scattering_pdf(&self, _r_in: &Ray, _rec: &HitRecord, _scattered: &Ray) -> f64 {
-        0.0
-    }
+        r_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool;
 
     fn emitted(&self, _u: f64, _v: f64, _p: &Point3) -> Color {
         color!(0, 0, 0)
@@ -44,25 +36,13 @@ impl Material for Lambertian {
         &self,
         r_in: &Ray,
         rec: &HitRecord,
-        albedo: &mut Color,
+        attenuation: &mut Color,
         scattered: &mut Ray,
-        pdf: &mut f64,
     ) -> bool {
-        let uvw = Onb::build_from_w(rec.normal);
-        let direction = uvw.local_vec3(random_cosine_direction());
-        *scattered = Ray::new_with_time(rec.p, direction.unit(), r_in.time);
-        *albedo = self.albedo.value(rec.u, rec.v, &rec.p);
-        *pdf = uvw.w().dot(scattered.dir) / PI;
+        let scatter_direction = rec.normal + random_unit_vector();
+        *scattered = Ray::new_with_time(rec.p, scatter_direction, r_in.time);
+        *attenuation = self.albedo.value(rec.u, rec.v, &rec.p);
         true
-    }
-
-    fn scattering_pdf(&self, _r_in: &Ray, rec: &HitRecord, scattered: &Ray) -> f64 {
-        let cosine = rec.normal.dot(scattered.dir.unit());
-        if cosine < 0.0 {
-            0.0
-        } else {
-            cosine / PI
-        }
     }
 }
 
@@ -85,9 +65,8 @@ impl Material for Metal {
         &self,
         r_in: &Ray,
         rec: &HitRecord,
-        albedo: &mut Color,
+        attenuation: &mut Color,
         scattered: &mut Ray,
-        _: &mut f64,
     ) -> bool {
         let reflected = reflect(&r_in.dir.unit(), &rec.normal);
         *scattered = Ray::new_with_time(
@@ -95,7 +74,7 @@ impl Material for Metal {
             reflected + self.fuzz * random_in_unit_sphere(),
             r_in.time,
         );
-        *albedo = self.albedo;
+        *attenuation = self.albedo;
         scattered.dir.dot(rec.normal) > 0.0
     }
 }
@@ -115,11 +94,10 @@ impl Material for Dielectric {
         &self,
         r_in: &Ray,
         rec: &HitRecord,
-        albedo: &mut Color,
+        attenuation: &mut Color,
         scattered: &mut Ray,
-        _: &mut f64,
     ) -> bool {
-        *albedo = color!(1, 1, 1);
+        *attenuation = color!(1, 1, 1);
         let etai_over_etat = if rec.front_face {
             1.0 / self.ref_idx
         } else {
@@ -161,9 +139,8 @@ impl Material for DiffuseLight {
         &self,
         _r_in: &Ray,
         _rec: &HitRecord,
-        _albedo: &mut Color,
+        _attenuation: &mut Color,
         _scattered: &mut Ray,
-        _pdf: &mut f64,
     ) -> bool {
         false
     }
@@ -193,12 +170,11 @@ impl Material for Isotropic {
         &self,
         r_in: &Ray,
         rec: &HitRecord,
-        albedo: &mut Color,
+        attenuation: &mut Color,
         scattered: &mut Ray,
-        _pdf: &mut f64,
     ) -> bool {
         *scattered = Ray::new_with_time(rec.p, random_in_unit_sphere(), r_in.time);
-        *albedo = self.albedo.value(rec.u, rec.v, &rec.p);
+        *attenuation = self.albedo.value(rec.u, rec.v, &rec.p);
 
         true
     }
