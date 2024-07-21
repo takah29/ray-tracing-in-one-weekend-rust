@@ -1,7 +1,7 @@
 use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use the_next_week::{
-    build_scene::cornell_smoke,
+    build_scene::final_scene,
     bvh::BvhNode,
     color,
     hittable::{HitRecord, Hittable},
@@ -43,9 +43,9 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
 
 fn main() {
     let samples_per_pixel = 100;
-    let max_depth = 50;
+    let max_depth = 10;
 
-    let (mut hittable_list, cam, background, image_width, image_height) = cornell_smoke();
+    let (mut hittable_list, cam, background, image_width, image_height) = final_scene();
     // let world: Box<dyn Hittable> = Box::new(hittable_list);
     let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
 
