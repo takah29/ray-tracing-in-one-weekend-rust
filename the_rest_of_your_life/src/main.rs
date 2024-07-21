@@ -5,10 +5,10 @@ use the_rest_of_your_life::{
     bvh::BvhNode,
     color,
     hittable::{HitRecord, Hittable},
+    pdf::{CosinePdf, Pdf},
     ray::Ray,
-    rtweekend::{random, random_range, Color, Vec3, INFINITY},
+    rtweekend::{random, Color, INFINITY},
     utils::write_ppm,
-    vec3,
 };
 
 fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) -> Color {
@@ -28,7 +28,7 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
         .as_ref()
         .expect("Material not set")
         .emitted(&rec, rec.u, rec.v, &rec.p);
-    let mut pdf = 0.0;
+    let mut pdf_val = 0.0;
     let mut albedo = color!(0, 0, 0);
 
     if !rec.opt_mat_ptr.as_ref().expect("Material not set").scatter(
@@ -36,32 +36,14 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
         &rec,
         &mut albedo,
         &mut scattered,
-        &mut pdf,
+        &mut pdf_val,
     ) {
         return emitted;
     }
 
-    let on_light = vec3!(
-        random_range(213.0, 343.0),
-        554.0,
-        random_range(227.0, 332.0)
-    );
-    let mut to_light = on_light - rec.p;
-    let distance_squared = to_light.length_squared();
-    to_light = to_light.unit();
-
-    if to_light.dot(rec.normal) < 0.0 {
-        return emitted;
-    }
-
-    let light_area = (343.0 - 213.0) * (332.0 - 227.0);
-    let light_cosine = to_light.e[1].abs();
-    if light_cosine < 0.000001 {
-        return emitted;
-    }
-
-    pdf = distance_squared / (light_cosine * light_area);
-    scattered = Ray::new_with_time(rec.p, to_light, r.time);
+    let p = CosinePdf::new(&rec.normal);
+    let scattered = Ray::new_with_time(rec.p, p.generate(), r.time);
+    pdf_val = p.value(&scattered.dir);
 
     emitted
         + albedo
@@ -71,11 +53,11 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
                 .expect("Material not set")
                 .scattering_pdf(&r, &rec, &scattered)
             * ray_color(scattered, background, world, depth - 1)
-            / pdf
+            / pdf_val
 }
 
 fn main() {
-    let samples_per_pixel = 10;
+    let samples_per_pixel = 100;
     let max_depth = 20;
 
     let (mut hittable_list, cam, background, image_width, image_height) = cornell_box();

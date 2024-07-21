@@ -10,6 +10,7 @@ pub mod hittable_list;
 pub mod material;
 pub mod moving_sphere;
 pub mod onb;
+pub mod pdf;
 pub mod perlin;
 pub mod ray;
 pub mod rtweekend;
