@@ -31,6 +31,7 @@ macro_rules! point3 {
     };
 }
 
+// 棄却サンプリングで単位球内のランダムなベクトルを返す
 pub fn random_in_unit_sphere() -> Vec3 {
     loop {
         let p = Vec3::random_range(-1.0, 1.0);
@@ -40,6 +41,7 @@ pub fn random_in_unit_sphere() -> Vec3 {
     }
 }
 
+// 単位球面上のランダムなベクトルを返す
 pub fn random_unit_vector() -> Vec3 {
     let a = random_range(0.0, 2.0 * PI);
     let z = random_range(-1.0, 1.0);
@@ -47,6 +49,7 @@ pub fn random_unit_vector() -> Vec3 {
     return vec3!(r * a.cos(), r * a.sin(), z);
 }
 
+// 半球内のランダムなベクトルを返す
 pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
     let in_unit_sphere = random_in_unit_sphere();
     if in_unit_sphere.dot(normal) > 0.0 {
@@ -56,6 +59,7 @@ pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
     }
 }
 
+// xy平面の単位円内のランダムなベクトルを返す
 pub fn random_in_unit_disk() -> Vec3 {
     loop {
         let p = vec3!(random_range(-1.0, 1.0), random_range(-1.0, 1.0), 0.0);
@@ -63,6 +67,19 @@ pub fn random_in_unit_disk() -> Vec3 {
             return p;
         }
     }
+}
+
+// 単位半球上のランダムなベクトルを返す
+pub fn random_cosine_direction() -> Vec3 {
+    let r1 = random();
+    let r2 = random();
+    let z = (1.0 - r2).sqrt();
+
+    let phi = 2.0 * PI * r1;
+    let x = phi.cos() * r2.sqrt();
+    let y = phi.sin() * r2.sqrt();
+
+    vec3!(x, y, z)
 }
 
 pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
