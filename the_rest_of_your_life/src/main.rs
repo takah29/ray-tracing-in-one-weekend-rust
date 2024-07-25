@@ -1,13 +1,17 @@
 use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
+use std::sync::Arc;
 use the_rest_of_your_life::{
+    aarect::XzRect,
     build_scene::cornell_box,
     bvh::BvhNode,
     color,
     hittable::{HitRecord, Hittable},
-    pdf::{CosinePdf, Pdf},
+    material::DiffuseLight,
+    pdf::{HittablePdf, Pdf},
     ray::Ray,
     rtweekend::{random, Color, INFINITY},
+    texture::SolidColor,
     utils::write_ppm,
 };
 
@@ -40,8 +44,18 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
     ) {
         return emitted;
     }
+    let light_shape = Arc::new(XzRect::new(
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+        Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
+            1, 1, 1
+        ))))),
+    ));
 
-    let p = CosinePdf::new(&rec.normal);
+    let p = HittablePdf::new(light_shape, rec.p);
     let scattered = Ray::new_with_time(rec.p, p.generate(), r.time);
     pdf_val = p.value(&scattered.dir);
 
@@ -57,7 +71,7 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
 }
 
 fn main() {
-    let samples_per_pixel = 100;
+    let samples_per_pixel = 10;
     let max_depth = 20;
 
     let (mut hittable_list, cam, background, image_width, image_height) = cornell_box();

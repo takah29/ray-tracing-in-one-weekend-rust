@@ -3,6 +3,7 @@ use crate::{
     material::Material,
     point3,
     rtweekend::{Point3, Ray, Vec3, INFINITY},
+    vec3,
 };
 use std::sync::Arc;
 
@@ -31,6 +32,13 @@ impl HitRecord {
 pub trait Hittable: Sync + Send {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
     fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut AABB) -> bool;
+    fn pdf_value(&self, _origin: &Point3, _v: &Vec3) -> f64 {
+        return 0.0;
+    }
+
+    fn random(&self, _origin: &Vec3) -> Vec3 {
+        return vec3!(1, 0, 0);
+    }
 }
 
 pub struct Translate {
