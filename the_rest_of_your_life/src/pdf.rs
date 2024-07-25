@@ -1,7 +1,7 @@
 use crate::{
     hittable::Hittable,
     onb::Onb,
-    rtweekend::{Point3, Vec3, PI},
+    rtweekend::{random, Point3, Vec3, PI},
     vec3::random_cosine_direction,
 };
 use std::sync::Arc;
@@ -56,5 +56,29 @@ impl Pdf for HittablePdf {
 
     fn generate(&self) -> Vec3 {
         self.obj_ptr.random(&self.origin)
+    }
+}
+
+pub struct MixturePdf {
+    p: [Arc<dyn Pdf>; 2],
+}
+
+impl MixturePdf {
+    pub fn new(p0: Arc<dyn Pdf>, p1: Arc<dyn Pdf>) -> Self {
+        Self { p: [p0, p1] }
+    }
+}
+
+impl Pdf for MixturePdf {
+    fn value(&self, direction: &Vec3) -> f64 {
+        0.5 * self.p[0].value(direction) + 0.5 * self.p[1].value(direction)
+    }
+
+    fn generate(&self) -> Vec3 {
+        if random() < 0.5 {
+            self.p[0].generate()
+        } else {
+            self.p[1].generate()
+        }
     }
 }

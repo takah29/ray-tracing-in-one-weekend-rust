@@ -8,7 +8,7 @@ use the_rest_of_your_life::{
     color,
     hittable::{HitRecord, Hittable},
     material::DiffuseLight,
-    pdf::{HittablePdf, Pdf},
+    pdf::{CosinePdf, HittablePdf, MixturePdf, Pdf},
     ray::Ray,
     rtweekend::{random, Color, INFINITY},
     texture::SolidColor,
@@ -55,9 +55,12 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
         ))))),
     ));
 
-    let p = HittablePdf::new(light_shape, rec.p);
-    let scattered = Ray::new_with_time(rec.p, p.generate(), r.time);
-    pdf_val = p.value(&scattered.dir);
+    let p0 = Arc::new(HittablePdf::new(light_shape, rec.p));
+    let p1 = Arc::new(CosinePdf::new(&rec.normal));
+    let mixture_pdf = MixturePdf::new(p0, p1);
+
+    let scattered = Ray::new_with_time(rec.p, mixture_pdf.generate(), r.time);
+    pdf_val = mixture_pdf.value(&scattered.dir);
 
     emitted
         + albedo
@@ -71,7 +74,7 @@ fn ray_color(r: Ray, background: &Color, world: &Box<dyn Hittable>, depth: i32) 
 }
 
 fn main() {
-    let samples_per_pixel = 10;
+    let samples_per_pixel = 1000;
     let max_depth = 20;
 
     let (mut hittable_list, cam, background, image_width, image_height) = cornell_box();
