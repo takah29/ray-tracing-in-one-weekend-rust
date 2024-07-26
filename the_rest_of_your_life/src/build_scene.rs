@@ -337,10 +337,11 @@ pub fn cornell_box() -> (HittableList, Camera, Color, usize, usize) {
         white.clone(),
     )));
 
+    let aluminum = Arc::new(Metal::new(&color!(0.8, 0.85, 0.88), 0.0));
     let box1 = Arc::new(Cuboid::new(
         point3!(0, 0, 0),
         point3!(165, 330, 165),
-        white.clone(),
+        aluminum,
     ));
     let box1 = Arc::new(RotateY::new(box1, 15.0));
     let box1 = Arc::new(Translate::new(box1, vec3!(265, 0, 295)));
