@@ -18,6 +18,7 @@ fn ray_color(
     background: &Color,
     world: &Box<dyn Hittable>,
     lights: &Arc<dyn Hittable>,
+    direct_light_sampling: bool,
     depth: i32,
 ) -> Color {
     let mut rec = HitRecord::default();
@@ -48,11 +49,25 @@ fn ray_color(
 
     if srec.is_specular {
         return srec.attenuation
-            * ray_color(srec.specular_ray, background, world, lights, depth - 1);
+            * ray_color(
+                srec.specular_ray,
+                background,
+                world,
+                lights,
+                direct_light_sampling,
+                depth - 1,
+            );
     }
 
-    let light_ptr = Arc::new(HittablePdf::new(lights.clone(), rec.p));
-    let p = MixturePdf::new(light_ptr, srec.opt_pdf_ptr.expect("PDF not set"));
+    let p: Arc<dyn Pdf> = if direct_light_sampling {
+        let light_ptr = Arc::new(HittablePdf::new(lights.clone(), rec.p));
+        Arc::new(MixturePdf::new(
+            light_ptr,
+            srec.opt_pdf_ptr.expect("PDF not set"),
+        ))
+    } else {
+        srec.opt_pdf_ptr.expect("PDF not set")
+    };
 
     let scattered = Ray::new_with_time(rec.p, p.generate(), r.time);
     let pdf_val = p.value(&scattered.dir);
@@ -64,7 +79,14 @@ fn ray_color(
                 .as_ref()
                 .expect("Material not set")
                 .scattering_pdf(&r, &rec, &scattered)
-            * ray_color(scattered, background, world, lights, depth - 1)
+            * ray_color(
+                scattered,
+                background,
+                world,
+                lights,
+                direct_light_sampling,
+                depth - 1,
+            )
             / pdf_val
 }
 
@@ -72,7 +94,15 @@ fn main() {
     let samples_per_pixel = 100;
     let max_depth = 20;
 
-    let (mut hittable_list, lights, cam, background, image_width, image_height) = cornell_box();
+    let (
+        mut hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    ) = cornell_box();
     // let world: Box<dyn Hittable> = Box::new(hittable_list);
     let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
     let lights: Arc<dyn Hittable> = Arc::new(lights);
@@ -99,7 +129,14 @@ fn main() {
                     let v = (j as f64 + random()) / (image_height - 1) as f64;
                     let r = cam.get_ray(u, v);
 
-                    pixel_color += ray_color(r, &background, &world, &lights, max_depth);
+                    pixel_color += ray_color(
+                        r,
+                        &background,
+                        &world,
+                        &lights,
+                        direct_light_sampling,
+                        max_depth,
+                    );
                 }
                 row_data[i] = pixel_color / samples_per_pixel as f64;
             }

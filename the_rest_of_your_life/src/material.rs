@@ -1,7 +1,7 @@
 use crate::{
     color,
     hittable::HitRecord,
-    pdf::{CosinePdf, Pdf},
+    pdf::{CosinePdf, Pdf, SpherePdf},
     rtweekend::{random, Color, Point3, Ray, PI},
     texture::Texture,
     vec3::{random_in_unit_sphere, reflect, refract},
@@ -164,12 +164,14 @@ impl Isotropic {
 }
 
 impl Material for Isotropic {
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
-        srec.is_specular = false;
-        srec.opt_pdf_ptr = None;
-        srec.specular_ray = Ray::new_with_time(rec.p, random_in_unit_sphere(), r_in.time);
+    fn scatter(&self, _r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
+        srec.opt_pdf_ptr = Some(Arc::new(SpherePdf));
         srec.attenuation = self.albedo.value(rec.u, rec.v, &rec.p);
 
         true
+    }
+
+    fn scattering_pdf(&self, _r_in: &Ray, _rec: &HitRecord, _scattered: &Ray) -> f64 {
+        1.0 / (4.0 * PI)
     }
 }

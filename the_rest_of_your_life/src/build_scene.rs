@@ -16,7 +16,15 @@ use crate::{
 use std::path::Path;
 use std::sync::Arc;
 
-pub fn random_scene() -> (HittableList, Camera, Color, usize, usize) {
+pub fn random_scene() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
     let mut hittable_list = HittableList::new();
 
     let checker = Arc::new(CheckerTexture::new(
@@ -74,6 +82,10 @@ pub fn random_scene() -> (HittableList, Camera, Color, usize, usize) {
     let material3 = Arc::new(Metal::new(&color!(0.7, 0.6, 0.5), 0.0));
     hittable_list.add(Arc::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));
 
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+
     // カメラの設定
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
@@ -99,10 +111,26 @@ pub fn random_scene() -> (HittableList, Camera, Color, usize, usize) {
         1.0,
     );
 
-    (hittable_list, cam, background, image_width, image_height)
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
 }
 
-pub fn two_spheres() -> (HittableList, Camera, Color, usize, usize) {
+pub fn two_spheres() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
     let mut hittable_list = HittableList::new();
 
     let checker = Arc::new(CheckerTexture::new(
@@ -121,6 +149,10 @@ pub fn two_spheres() -> (HittableList, Camera, Color, usize, usize) {
         Arc::new(Lambertian::new(checker.clone())),
     )));
 
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+
     // カメラの設定
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
@@ -146,10 +178,26 @@ pub fn two_spheres() -> (HittableList, Camera, Color, usize, usize) {
         1.0,
     );
 
-    (hittable_list, cam, background, image_width, image_height)
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
 }
 
-pub fn two_perlin_spheres() -> (HittableList, Camera, Color, usize, usize) {
+pub fn two_perlin_spheres() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
     let mut hittable_list = HittableList::new();
 
     let pertext = Arc::new(NoiseTexture::new(5.0));
@@ -165,6 +213,10 @@ pub fn two_perlin_spheres() -> (HittableList, Camera, Color, usize, usize) {
         Arc::new(Lambertian::new(pertext.clone())),
     )));
 
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+
     // カメラの設定
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
@@ -190,10 +242,26 @@ pub fn two_perlin_spheres() -> (HittableList, Camera, Color, usize, usize) {
         1.0,
     );
 
-    (hittable_list, cam, background, image_width, image_height)
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
 }
 
-pub fn earth() -> (HittableList, Camera, Color, usize, usize) {
+pub fn earth() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
     let image_path = Path::new("./data/earthmap.jpg");
     let earth_texture = Arc::new(ImageTexture::new(image_path));
     let earth_surface = Arc::new(Lambertian::new(earth_texture));
@@ -201,6 +269,10 @@ pub fn earth() -> (HittableList, Camera, Color, usize, usize) {
 
     let hittable_list = HittableList::new_with_object(globe);
 
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+
     // カメラの設定
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
@@ -226,10 +298,26 @@ pub fn earth() -> (HittableList, Camera, Color, usize, usize) {
         1.0,
     );
 
-    (hittable_list, cam, background, image_width, image_height)
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
 }
 
-pub fn simple_light() -> (HittableList, Camera, Color, usize, usize) {
+pub fn simple_light() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
     let mut hittable_list = HittableList::new();
 
     let pertext = Arc::new(NoiseTexture::new(4.0));
@@ -262,6 +350,10 @@ pub fn simple_light() -> (HittableList, Camera, Color, usize, usize) {
         difflight.clone(),
     )));
 
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+
     // カメラの設定
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
@@ -287,10 +379,26 @@ pub fn simple_light() -> (HittableList, Camera, Color, usize, usize) {
         1.0,
     );
 
-    (hittable_list, cam, background, image_width, image_height)
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
 }
 
-pub fn cornell_box() -> (HittableList, HittableList, Camera, Color, usize, usize) {
+pub fn cornell_box() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
     // オブジェクトの設定
     let mut hittable_list = HittableList::new();
 
@@ -372,6 +480,7 @@ pub fn cornell_box() -> (HittableList, HittableList, Camera, Color, usize, usize
             0, 0, 0
         ))))),
     )));
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
     // カメラの設定
     let aspect_ratio = 1.0;
@@ -401,6 +510,7 @@ pub fn cornell_box() -> (HittableList, HittableList, Camera, Color, usize, usize
     (
         hittable_list,
         lights,
+        direct_light_sampling,
         cam,
         background,
         image_width,
@@ -408,7 +518,15 @@ pub fn cornell_box() -> (HittableList, HittableList, Camera, Color, usize, usize
     )
 }
 
-pub fn cornell_smoke() -> (HittableList, Camera, Color, usize, usize) {
+pub fn cornell_smoke() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
     // オブジェクトの設定
     let mut hittable_list = HittableList::new();
 
@@ -427,9 +545,9 @@ pub fn cornell_smoke() -> (HittableList, Camera, Color, usize, usize) {
 
     hittable_list.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
     hittable_list.add(Arc::new(YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
-    hittable_list.add(Arc::new(XzRect::new(
+    hittable_list.add(Arc::new(FlipFace::new(Arc::new(XzRect::new(
         113.0, 443.0, 127.0, 432.0, 554.0, light,
-    )));
+    )))));
     hittable_list.add(Arc::new(XzRect::new(
         0.0,
         555.0,
@@ -481,6 +599,10 @@ pub fn cornell_smoke() -> (HittableList, Camera, Color, usize, usize) {
         Arc::new(SolidColor::new(color!(1, 1, 1))),
     )));
 
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+
     // カメラの設定
     let aspect_ratio = 1.0;
     let image_width = 500;
@@ -506,10 +628,26 @@ pub fn cornell_smoke() -> (HittableList, Camera, Color, usize, usize) {
         1.0,
     );
 
-    (hittable_list, cam, background, image_width, image_height)
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
 }
 
-pub fn final_scene() -> (HittableList, Camera, Color, usize, usize) {
+pub fn final_scene() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
     let mut boxes1 = HittableList::new();
     let ground = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
         0.48, 0.83, 0.53
@@ -541,9 +679,9 @@ pub fn final_scene() -> (HittableList, Camera, Color, usize, usize) {
     let light = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
         7, 7, 7
     )))));
-    hittable_list.add(Arc::new(XzRect::new(
+    hittable_list.add(Arc::new(FlipFace::new(Arc::new(XzRect::new(
         123.0, 423.0, 147.0, 412.0, 554.0, light,
-    )));
+    )))));
 
     let center0 = point3!(400, 400, 200);
     let center1 = center0 + vec3!(30, 0, 0);
@@ -626,6 +764,10 @@ pub fn final_scene() -> (HittableList, Camera, Color, usize, usize) {
         vec3!(-100, 270, 395),
     )));
 
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+
     // カメラの設定
     let aspect_ratio = 1.0;
     let image_width = 500;
@@ -651,5 +793,13 @@ pub fn final_scene() -> (HittableList, Camera, Color, usize, usize) {
         1.0,
     );
 
-    (hittable_list, cam, background, image_width, image_height)
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
 }
