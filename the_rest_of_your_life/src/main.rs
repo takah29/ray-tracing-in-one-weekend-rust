@@ -2,19 +2,14 @@ use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use std::sync::Arc;
 use the_rest_of_your_life::{
-    aarect::XzRect,
     build_scene::cornell_box,
     bvh::BvhNode,
     color,
     hittable::{HitRecord, Hittable},
-    hittable_list::HittableList,
-    material::{DiffuseLight, ScatterRecord},
+    material::ScatterRecord,
     pdf::{HittablePdf, MixturePdf, Pdf},
-    point3,
     ray::Ray,
-    rtweekend::{random, Color, Point3, INFINITY},
-    sphere::Sphere,
-    texture::SolidColor,
+    rtweekend::{random, Color, INFINITY},
     utils::write_ppm,
 };
 
@@ -74,31 +69,12 @@ fn ray_color(
 }
 
 fn main() {
-    let samples_per_pixel = 1000;
+    let samples_per_pixel = 100;
     let max_depth = 20;
 
-    let (mut hittable_list, cam, background, image_width, image_height) = cornell_box();
+    let (mut hittable_list, lights, cam, background, image_width, image_height) = cornell_box();
     // let world: Box<dyn Hittable> = Box::new(hittable_list);
     let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
-
-    let mut lights = HittableList::new();
-    lights.add(Arc::new(XzRect::new(
-        213.0,
-        343.0,
-        227.0,
-        332.0,
-        554.0,
-        Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
-            0, 0, 0
-        ))))),
-    )));
-    lights.add(Arc::new(Sphere::new(
-        point3!(190, 90, 190),
-        90.0,
-        Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
-            0, 0, 0
-        ))))),
-    )));
     let lights: Arc<dyn Hittable> = Arc::new(lights);
 
     let pb = ProgressBar::new(image_height as u64);

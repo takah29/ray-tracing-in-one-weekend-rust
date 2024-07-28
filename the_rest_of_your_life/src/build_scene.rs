@@ -290,7 +290,7 @@ pub fn simple_light() -> (HittableList, Camera, Color, usize, usize) {
     (hittable_list, cam, background, image_width, image_height)
 }
 
-pub fn cornell_box() -> (HittableList, Camera, Color, usize, usize) {
+pub fn cornell_box() -> (HittableList, HittableList, Camera, Color, usize, usize) {
     // オブジェクトの設定
     let mut hittable_list = HittableList::new();
 
@@ -353,6 +353,26 @@ pub fn cornell_box() -> (HittableList, Camera, Color, usize, usize) {
     ));
     hittable_list.add(sphere);
 
+    // ライトの設定
+    let mut lights = HittableList::new();
+    lights.add(Arc::new(XzRect::new(
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+        Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
+            0, 0, 0
+        ))))),
+    )));
+    lights.add(Arc::new(Sphere::new(
+        point3!(190, 90, 190),
+        90.0,
+        Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
+            0, 0, 0
+        ))))),
+    )));
+
     // カメラの設定
     let aspect_ratio = 1.0;
     let image_width = 500;
@@ -378,7 +398,14 @@ pub fn cornell_box() -> (HittableList, Camera, Color, usize, usize) {
         1.0,
     );
 
-    (hittable_list, cam, background, image_width, image_height)
+    (
+        hittable_list,
+        lights,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
 }
 
 pub fn cornell_smoke() -> (HittableList, Camera, Color, usize, usize) {
