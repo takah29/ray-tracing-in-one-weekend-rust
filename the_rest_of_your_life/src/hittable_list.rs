@@ -1,6 +1,6 @@
 use crate::aabb::{surrounding_box, AABB};
 use crate::hittable::{HitRecord, Hittable};
-use crate::rtweekend::Ray;
+use crate::rtweekend::{random_int, Ray, Vec3};
 use std::sync::Arc;
 
 pub struct HittableList {
@@ -66,5 +66,21 @@ impl Hittable for HittableList {
         }
 
         true
+    }
+
+    fn pdf_value(&self, origin: &crate::vec3::Point3, v: &crate::vec3::Vec3) -> f64 {
+        let weight = 1.0 / self.objects.len() as f64;
+        let sum = self
+            .objects
+            .iter()
+            .map(|x| weight * x.pdf_value(origin, v))
+            .sum();
+
+        sum
+    }
+
+    fn random(&self, origin: &Vec3) -> Vec3 {
+        let int_size = self.objects.len();
+        self.objects[random_int(0, (int_size - 1) as i32) as usize].random(origin)
     }
 }
