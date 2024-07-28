@@ -1,8 +1,13 @@
-use crate::aabb::AABB;
-use crate::hittable::{HitRecord, Hittable};
-use crate::material::Material;
-use crate::rtweekend::{Point3, Ray, Vec3, PI};
-use crate::vec3;
+use crate::{
+    aabb::AABB,
+    hittable::{HitRecord, Hittable},
+    material::Material,
+    onb::Onb,
+    rtweekend::{Point3, Ray, Vec3, PI},
+    vec3,
+    vec3::random_to_sphere,
+};
+use std::f64::INFINITY;
 use std::sync::Arc;
 
 pub struct Sphere {
@@ -66,6 +71,27 @@ impl Hittable for Sphere {
             self.center + vec3!(self.radius, self.radius, self.radius),
         );
         true
+    }
+
+    fn pdf_value(&self, origin: &Point3, v: &Vec3) -> f64 {
+        let mut rec = HitRecord::default();
+        if !self.hit(&Ray::new(*origin, *v), 0.001, INFINITY, &mut rec) {
+            return 0.0;
+        }
+
+        let cos_theta_max =
+            (1.0 - self.radius.powi(2) / (self.center - *origin).length_squared()).sqrt();
+        let solid_angle = 2.0 * PI * (1.0 - cos_theta_max);
+
+        1.0 / solid_angle
+    }
+
+    fn random(&self, origin: &Vec3) -> Vec3 {
+        let direction = self.center - *origin;
+        let distance_squared = direction.length_squared();
+        let uvw = Onb::build_from_w(direction);
+
+        uvw.local_vec3(random_to_sphere(self.radius, distance_squared))
     }
 }
 

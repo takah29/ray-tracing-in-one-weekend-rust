@@ -99,6 +99,8 @@ impl Dielectric {
 
 impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
+        srec.is_specular = true;
+        srec.opt_pdf_ptr = None;
         srec.attenuation = color!(1, 1, 1);
         let etai_over_etat = if rec.front_face {
             1.0 / self.ref_idx
@@ -137,10 +139,6 @@ impl DiffuseLight {
 }
 
 impl Material for DiffuseLight {
-    fn scatter(&self, _r_in: &Ray, _rec: &HitRecord, _srec: &mut ScatterRecord) -> bool {
-        false
-    }
-
     fn emitted(&self, rec: &HitRecord, u: f64, v: f64, p: &Point3) -> Color {
         if rec.front_face {
             self.emit.value(u, v, p)
@@ -167,6 +165,8 @@ impl Isotropic {
 
 impl Material for Isotropic {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
+        srec.is_specular = false;
+        srec.opt_pdf_ptr = None;
         srec.specular_ray = Ray::new_with_time(rec.p, random_in_unit_sphere(), r_in.time);
         srec.attenuation = self.albedo.value(rec.u, rec.v, &rec.p);
 

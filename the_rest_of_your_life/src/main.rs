@@ -9,8 +9,10 @@ use the_rest_of_your_life::{
     hittable::{HitRecord, Hittable},
     material::{DiffuseLight, ScatterRecord},
     pdf::{HittablePdf, MixturePdf, Pdf},
+    point3,
     ray::Ray,
-    rtweekend::{random, Color, INFINITY},
+    rtweekend::{random, Color, Point3, INFINITY},
+    sphere::Sphere,
     texture::SolidColor,
     utils::write_ppm,
 };
@@ -77,12 +79,19 @@ fn main() {
     let (mut hittable_list, cam, background, image_width, image_height) = cornell_box();
     // let world: Box<dyn Hittable> = Box::new(hittable_list);
     let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
-    let light: Arc<dyn Hittable> = Arc::new(XzRect::new(
+    let _light: Arc<dyn Hittable> = Arc::new(XzRect::new(
         213.0,
         343.0,
         227.0,
         332.0,
         554.0,
+        Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
+            0, 0, 0
+        ))))),
+    ));
+    let grass_sphere: Arc<dyn Hittable> = Arc::new(Sphere::new(
+        point3!(190, 90, 190),
+        90.0,
         Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
             0, 0, 0
         ))))),
@@ -110,7 +119,7 @@ fn main() {
                     let v = (j as f64 + random()) / (image_height - 1) as f64;
                     let r = cam.get_ray(u, v);
 
-                    pixel_color += ray_color(r, &background, &world, &light, max_depth);
+                    pixel_color += ray_color(r, &background, &world, &grass_sphere, max_depth);
                 }
                 row_data[i] = pixel_color / samples_per_pixel as f64;
             }

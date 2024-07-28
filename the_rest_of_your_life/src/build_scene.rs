@@ -337,24 +337,21 @@ pub fn cornell_box() -> (HittableList, Camera, Color, usize, usize) {
         white.clone(),
     )));
 
-    let aluminum = Arc::new(Metal::new(&color!(0.8, 0.85, 0.88), 0.0));
     let box1 = Arc::new(Cuboid::new(
         point3!(0, 0, 0),
         point3!(165, 330, 165),
-        aluminum,
+        white.clone(),
     ));
     let box1 = Arc::new(RotateY::new(box1, 15.0));
     let box1 = Arc::new(Translate::new(box1, vec3!(265, 0, 295)));
     hittable_list.add(box1);
 
-    let box2 = Arc::new(Cuboid::new(
-        point3!(0, 0, 0),
-        point3!(165, 165, 165),
-        white.clone(),
+    let sphere = Arc::new(Sphere::new(
+        point3!(190, 90, 190),
+        90.0,
+        Arc::new(Dielectric::new(1.5)),
     ));
-    let box2 = Arc::new(RotateY::new(box2, -18.0));
-    let box2 = Arc::new(Translate::new(box2, vec3!(130, 0, 65)));
-    hittable_list.add(box2);
+    hittable_list.add(sphere);
 
     // カメラの設定
     let aspect_ratio = 1.0;

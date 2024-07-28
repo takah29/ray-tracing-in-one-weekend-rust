@@ -82,6 +82,18 @@ pub fn random_cosine_direction() -> Vec3 {
     vec3!(x, y, z)
 }
 
+pub fn random_to_sphere(radius: f64, distance_squared: f64) -> Vec3 {
+    let r1 = random();
+    let r2 = random();
+    let z = 1.0 + r2 * ((1.0 - radius * radius / distance_squared).sqrt() - 1.0);
+
+    let phi = 2.0 * PI * r1;
+    let x = phi.cos() * (1.0 - z * z).sqrt();
+    let y = phi.sin() * (1.0 - z * z).sqrt();
+
+    vec3!(x, y, z)
+}
+
 pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
     *v - 2.0 * v.dot(*n) * (*n)
 }
