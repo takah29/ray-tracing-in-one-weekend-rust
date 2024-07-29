@@ -185,125 +185,136 @@ pub fn random_scene() -> (
     )
 }
 
-// pub fn two_spheres() -> (
-//     HittableList,
-//     HittableList,
-//     bool,
-//     Camera,
-//     Color,
-//     usize,
-//     usize,
-// ) {
-//     let mut hittable_list = HittableList::new();
+pub fn two_spheres() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
+    let mut hittable_list = HittableList::new();
 
-//     let checker = Arc::new(CheckerTexture::new(
-//         Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
-//         Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
-//     ));
+    let checker = Arc::new(CheckerTexture::new(
+        Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
+        Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
+    ));
 
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, -10, 0),
-//         10.0,
-//         Arc::new(Lambertian::new(checker.clone())),
-//     )));
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, 10, 0),
-//         10.0,
-//         Arc::new(Lambertian::new(checker.clone())),
-//     )));
+    hittable_list.add(Arc::new(Sphere::new(
+        point3!(0, -10, 0),
+        10.0,
+        Arc::new(Lambertian::new(checker.clone())),
+    )));
+    hittable_list.add(Arc::new(Sphere::new(
+        point3!(0, 10, 0),
+        10.0,
+        Arc::new(Lambertian::new(checker.clone())),
+    )));
 
-//     // ライトの設定
-//     let lights = HittableList::new();
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
-//     // カメラの設定
-//     let aspect_ratio = 16.0 / 9.0;
-//     let image_width = 400;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0.7, 0.8, 1);
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
 
-//     let lookfrom = point3!(13, 2, 3);
-//     let lookat = point3!(0, 0, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.1;
-//     let vfov = 20.0;
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
 
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
 
-//     (
-//         hittable_list,
-//         lights,
-//         direct_light_sampling,
-//         cam,
-//         background,
-//         image_width,
-//         image_height,
-//     )
-// }
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
+}
 
-// pub fn two_perlin_spheres() -> (
-//     HittableList,
-//     HittableList,
-//     bool,
-//     Camera,
-//     Color,
-//     usize,
-//     usize,
-// ) {
-//     let mut hittable_list = HittableList::new();
+pub fn two_perlin_spheres() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
+    let mut hittable_list = HittableList::new();
 
-//     let pertext = Arc::new(NoiseTexture::new(5.0));
+    let pertext = Arc::new(NoiseTexture::new(5.0));
 
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, -1000, 0),
-//         1000.0,
-//         Arc::new(Lambertian::new(pertext.clone())),
-//     )));
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, 2, 0),
-//         2.0,
-//         Arc::new(Lambertian::new(pertext.clone())),
-//     )));
+    hittable_list.add(Arc::new(Sphere::new(
+        point3!(0, -1000, 0),
+        1000.0,
+        Arc::new(Lambertian::new(pertext.clone())),
+    )));
+    hittable_list.add(Arc::new(Sphere::new(
+        point3!(0, 2, 0),
+        2.0,
+        Arc::new(Lambertian::new(pertext.clone())),
+    )));
 
-//     // ライトの設定
-//     let lights = HittableList::new();
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
-//     // カメラの設定
-//     let aspect_ratio = 16.0 / 9.0;
-//     let image_width = 400;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0.7, 0.8, 1);
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
 
-//     let lookfrom = point3!(13, 2, 3);
-//     let lookat = point3!(0, 0, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.1;
-//     let vfov = 20.0;
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
 
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
+
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
+}
 
 // pub fn simple_light() -> (
 //     HittableList,
