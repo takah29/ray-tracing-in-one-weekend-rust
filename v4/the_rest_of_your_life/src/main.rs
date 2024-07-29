@@ -2,7 +2,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use std::sync::Arc;
 use the_rest_of_your_life::{
-    build_scene::cornell_box,
+    build_scene::minimul_scene,
     bvh::BvhNode,
     color,
     hittable::{HitRecord, Hittable},
@@ -22,18 +22,17 @@ fn ray_color(
     direct_light_sampling: bool,
     depth: i32,
 ) -> Color {
-    let mut rec = HitRecord::default();
-
     if depth <= 0 {
         return color!(0, 0, 0);
     }
 
+    let mut rec = HitRecord::default();
     if !world.hit(&r, Interval::new(0.001, INFINITY), &mut rec) {
         return *background;
     }
 
     let mut srec = ScatterRecord::default();
-    let emitted = rec
+    let color_from_emission = rec
         .opt_mat_ptr
         .as_ref()
         .expect("Material not set")
@@ -45,7 +44,7 @@ fn ray_color(
         .expect("Material not set")
         .scatter(&r, &rec, &mut srec)
     {
-        return emitted;
+        return color_from_emission;
     }
 
     if srec.skip_pdf {
@@ -71,24 +70,25 @@ fn ray_color(
     };
 
     let scattered = Ray::new_with_time(rec.p, p.generate(), r.time);
-    let pdf_val = p.value(&scattered.dir);
+    let pdf_value = p.value(&scattered.dir);
 
-    emitted
-        + srec.attenuation
-            * rec
-                .opt_mat_ptr
-                .as_ref()
-                .expect("Material not set")
-                .scattering_pdf(&r, &rec, &scattered)
-            * ray_color(
-                scattered,
-                background,
-                world,
-                lights,
-                direct_light_sampling,
-                depth - 1,
-            )
-            / pdf_val
+    let scattering_pdf = rec
+        .opt_mat_ptr
+        .as_ref()
+        .expect("Material not set")
+        .scattering_pdf(&r, &rec, &scattered);
+
+    let sample_color = ray_color(
+        scattered,
+        background,
+        world,
+        lights,
+        direct_light_sampling,
+        depth - 1,
+    );
+    let color_from_scatter = (srec.attenuation * scattering_pdf * sample_color) / pdf_value;
+
+    color_from_emission + color_from_scatter
 }
 
 fn main() {
@@ -103,9 +103,9 @@ fn main() {
         background,
         image_width,
         image_height,
-    ) = cornell_box();
-    // let world: Box<dyn Hittable> = Box::new(hittable_list);
-    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
+    ) = minimul_scene();
+    let world: Box<dyn Hittable> = Box::new(hittable_list);
+    // let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
     let lights: Arc<dyn Hittable> = Arc::new(lights);
 
     let pb = ProgressBar::new(image_height as u64);
