@@ -1,7 +1,7 @@
 use crate::{
-    // bvh::BvhNode,
+    bvh::BvhNode,
     camera::Camera,
-    // constant_medium::ConstantMedium,
+    constant_medium::ConstantMedium,
     hittable::{RotateY, Translate},
     hittable_list::HittableList,
     material::{Dielectric, DiffuseLight, EmptyMaterial, Lambertian, Metal},
@@ -275,6 +275,62 @@ pub fn two_perlin_spheres() -> (
         2.0,
         Arc::new(Lambertian::new(pertext.clone())),
     )));
+
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
+
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
+
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
+
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
+}
+
+pub fn earth() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
+    let image_path = Path::new("./data/earthmap.jpg");
+    let earth_texture = Arc::new(ImageTexture::new(image_path));
+    let earth_surface = Arc::new(Lambertian::new(earth_texture));
+    let globe = Arc::new(Sphere::new(point3!(0, 0, 0), 2.0, earth_surface));
+
+    let hittable_list = HittableList::new_with_object(globe);
 
     // ライトの設定
     let lights = HittableList::new();
