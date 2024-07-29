@@ -2,9 +2,8 @@ use crate::{
     aabb::Aabb,
     hittable::{HitRecord, Hittable},
     interval::Interval,
-    material::Isotropic,
-    material::Material,
-    rtweekend::{random, Ray, Vec3, INFINITY},
+    material::{Isotropic, Material},
+    rtweekend::{random, Color, Ray, Vec3, INFINITY},
     texture::Texture,
     vec3,
 };
@@ -12,25 +11,30 @@ use std::sync::Arc;
 
 pub struct ConstantMedium {
     boundary: Arc<dyn Hittable>,
-    phase_function: Arc<dyn Material>,
     neg_inv_density: f64,
+    phase_function: Arc<dyn Material>,
 }
 
 impl ConstantMedium {
-    pub fn new(boundary: Arc<dyn Hittable>, d: f64, a: Arc<dyn Texture>) -> Self {
+    pub fn new(boundary: Arc<dyn Hittable>, density: f64, tex: Arc<dyn Texture>) -> Self {
         Self {
             boundary,
-            neg_inv_density: -1.0 / d,
-            phase_function: Arc::new(Isotropic::new(a)),
+            neg_inv_density: -1.0 / density,
+            phase_function: Arc::new(Isotropic::new(tex)),
+        }
+    }
+
+    pub fn new_with_color(boundary: Arc<dyn Hittable>, density: f64, color: Color) -> Self {
+        Self {
+            boundary,
+            neg_inv_density: -1.0 / density,
+            phase_function: Arc::new(Isotropic::new_with_color(color)),
         }
     }
 }
 
 impl Hittable for ConstantMedium {
     fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
-        let enable_debug = false;
-        let debugging = enable_debug && random() < 0.00001;
-
         let mut rec1 = HitRecord::default();
         let mut rec2 = HitRecord::default();
 
@@ -44,10 +48,6 @@ impl Hittable for ConstantMedium {
         {
             return false;
         }
-
-        if debugging {
-            eprintln!("\nt0={}, t1={}", rec1.t, rec2.t)
-        };
 
         if rec1.t < ray_t.min {
             rec1.t = ray_t.min
@@ -75,13 +75,6 @@ impl Hittable for ConstantMedium {
         rec.t = rec1.t + hit_distance / ray_length;
         rec.p = r.at(rec.t);
 
-        if debugging {
-            eprintln!(
-                "hit_distance = {}\nrec.t = {}\nrec.p = {:?}",
-                hit_distance, rec.t, rec.p
-            );
-        }
-
         rec.normal = vec3!(1, 0, 0); // どんな値でもよい
         rec.front_face = true; // 同じくどんな値でもよい
         rec.opt_mat_ptr = Some(self.phase_function.clone());
@@ -89,7 +82,7 @@ impl Hittable for ConstantMedium {
         true
     }
 
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut Aabb) -> bool {
-        self.boundary.bounding_box(t0, t1, output_box)
+    fn bounding_box(&self) -> Aabb {
+        self.boundary.bounding_box()
     }
 }

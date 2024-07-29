@@ -22,7 +22,13 @@ impl BvhNode {
         time0: f64,
         time1: f64,
     ) -> Self {
-        let axis = random_int(0, 2);
+        let mut bbox = Aabb::new_with_empty();
+        for object_index in start..end {
+            bbox = Aabb::from_boxes(bbox, objects[object_index].bounding_box());
+        }
+
+        let axis = bbox.longest_axis();
+
         let comparator = match axis {
             0 => box_x_compare,
             1 => box_y_compare,
@@ -51,17 +57,6 @@ impl BvhNode {
             }
         };
 
-        let mut box_left = Aabb::new_with_empty();
-        let mut box_right = Aabb::new_with_empty();
-
-        if !left.bounding_box(time0, time1, &mut box_left)
-            || !right.bounding_box(time0, time1, &mut box_right)
-        {
-            eprintln!("No bounding box in bvh_node constructor.");
-        }
-
-        let bbox = Aabb::from_boxes(box_left, box_right);
-
         Self { left, right, bbox }
     }
 
@@ -87,25 +82,19 @@ impl Hittable for BvhNode {
         hit_left || hit_right
     }
 
-    fn bounding_box(&self, _: f64, _: f64, output_box: &mut Aabb) -> bool {
-        *output_box = self.bbox.clone();
-        true
+    fn bounding_box(&self) -> Aabb {
+        self.bbox
     }
 }
 
-fn box_compare(a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>, axis: usize) -> Ordering {
-    let mut box_a = Aabb::new_with_empty();
-    let mut box_b = Aabb::new_with_empty();
+fn box_compare(a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>, axis_index: usize) -> Ordering {
+    let a_axis_interval = a.bounding_box().axis_interval(axis_index);
+    let b_axis_interval = b.bounding_box().axis_interval(axis_index);
 
-    if !a.bounding_box(0.0, 0.0, &mut box_a) || !b.bounding_box(0.0, 0.0, &mut box_b) {
-        eprintln!("No bounding box in bvh_node constructor.");
-    }
-
-    box_a
-        .axis_interval(axis)
+    a_axis_interval
         .min
-        .partial_cmp(&box_b.axis_interval(axis).min)
-        .unwrap_or(Ordering::Equal)
+        .partial_cmp(&b_axis_interval.min)
+        .expect("Values are not comparable")
 }
 
 fn box_x_compare(a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>) -> Ordering {
