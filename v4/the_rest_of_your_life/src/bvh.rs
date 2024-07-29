@@ -3,7 +3,7 @@ use crate::{
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
     interval::Interval,
-    rtweekend::{random_int, Ray},
+    rtweekend::Ray,
 };
 use std::cmp::Ordering;
 use std::sync::Arc;

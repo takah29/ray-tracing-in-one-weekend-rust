@@ -1,6 +1,6 @@
 pub mod aabb;
 pub mod build_scene;
-// pub mod bvh;
+pub mod bvh;
 pub mod camera;
 pub mod constant_medium;
 pub mod hittable;

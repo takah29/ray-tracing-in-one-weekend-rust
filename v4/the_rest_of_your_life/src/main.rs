@@ -2,8 +2,8 @@ use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use std::sync::Arc;
 use the_rest_of_your_life::{
-    build_scene::random_scene,
-    // bvh::BvhNode,
+    build_scene::two_perlin_spheres,
+    bvh::BvhNode,
     color,
     hittable::{HitRecord, Hittable},
     interval::Interval,
@@ -103,9 +103,9 @@ fn main() {
         background,
         image_width,
         image_height,
-    ) = random_scene();
-    let world: Box<dyn Hittable> = Box::new(hittable_list);
-    // let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
+    ) = two_perlin_spheres();
+    // let world: Box<dyn Hittable> = Box::new(hittable_list);
+    let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
     let lights: Arc<dyn Hittable> = Arc::new(lights);
 
     let pb = ProgressBar::new(image_height as u64);

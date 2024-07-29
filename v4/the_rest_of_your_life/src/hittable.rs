@@ -156,13 +156,3 @@ impl Hittable for RotateY {
         self.bbox
     }
 }
-
-pub struct FlipFace {
-    obj_ptr: Arc<dyn Hittable>,
-}
-
-impl FlipFace {
-    pub fn new(obj_ptr: Arc<dyn Hittable>) -> Self {
-        Self { obj_ptr }
-    }
-}
