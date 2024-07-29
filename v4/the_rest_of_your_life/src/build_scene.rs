@@ -316,156 +316,84 @@ pub fn two_perlin_spheres() -> (
     )
 }
 
-// pub fn simple_light() -> (
-//     HittableList,
-//     HittableList,
-//     bool,
-//     Camera,
-//     Color,
-//     usize,
-//     usize,
-// ) {
-//     let mut hittable_list = HittableList::new();
+pub fn simple_light() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
+    let mut world = HittableList::new();
 
-//     let pertext = Arc::new(NoiseTexture::new(4.0));
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, -1000, 0),
-//         1000.0,
-//         Arc::new(Lambertian::new(pertext.clone())),
-//     )));
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, 2, 0),
-//         2.0,
-//         Arc::new(Lambertian::new(pertext.clone())),
-//     )));
+    let pertext = Arc::new(NoiseTexture::new(4.0));
+    world.add(Arc::new(Sphere::new(
+        point3!(0, -1000, 0),
+        1000.0,
+        Arc::new(Lambertian::new(pertext.clone())),
+    )));
+    world.add(Arc::new(Sphere::new(
+        point3!(0, 2, 0),
+        2.0,
+        Arc::new(Lambertian::new(pertext.clone())),
+    )));
 
-//     let difflight = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
-//         4, 4, 4
-//     )))));
+    let difflight = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
+        4, 4, 4
+    )))));
 
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, 7, 0),
-//         2.0,
-//         difflight.clone(),
-//     )));
-//     hittable_list.add(Arc::new(XyRect::new(
-//         3.0,
-//         5.0,
-//         1.0,
-//         3.0,
-//         -2.0,
-//         difflight.clone(),
-//     )));
+    world.add(Arc::new(Sphere::new(
+        point3!(0, 7, 0),
+        2.0,
+        difflight.clone(),
+    )));
+    world.add(Arc::new(Quad::new(
+        point3!(3, 1, -2),
+        vec3!(2, 0, 0),
+        vec3!(0, 2, 0),
+        difflight,
+    )));
 
-//     // ライトの設定
-//     let lights = HittableList::new();
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
-//     // カメラの設定
-//     let aspect_ratio = 16.0 / 9.0;
-//     let image_width = 400;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0, 0, 0);
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0, 0, 0);
 
-//     let lookfrom = point3!(26, 3, 6);
-//     let lookat = point3!(0, 2, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.0;
-//     let vfov = 20.0;
+    let lookfrom = point3!(26, 3, 6);
+    let lookat = point3!(0, 2, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 20.0;
 
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
 
-//     (
-//         hittable_list,
-//         lights,
-//         direct_light_sampling,
-//         cam,
-//         background,
-//         image_width,
-//         image_height,
-//     )
-// }
-
-//     let pertext = Arc::new(NoiseTexture::new(4.0));
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, -1000, 0),
-//         1000.0,
-//         Arc::new(Lambertian::new(pertext.clone())),
-//     )));
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, 2, 0),
-//         2.0,
-//         Arc::new(Lambertian::new(pertext.clone())),
-//     )));
-
-//     let difflight = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
-//         4, 4, 4
-//     )))));
-
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, 7, 0),
-//         2.0,
-//         difflight.clone(),
-//     )));
-//     hittable_list.add(Arc::new(XyRect::new(
-//         3.0,
-//         5.0,
-//         1.0,
-//         3.0,
-//         -2.0,
-//         difflight.clone(),
-//     )));
-
-//     // ライトの設定
-//     let lights = HittableList::new();
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
-
-//     // カメラの設定
-//     let aspect_ratio = 16.0 / 9.0;
-//     let image_width = 400;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0, 0, 0);
-
-//     let lookfrom = point3!(26, 3, 6);
-//     let lookat = point3!(0, 2, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.0;
-//     let vfov = 20.0;
-
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
-
-//     (
-//         hittable_list,
-//         lights,
-//         direct_light_sampling,
-//         cam,
-//         background,
-//         image_width,
-//         image_height,
-//     )
-// }
+    (
+        world,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
+}
 
 pub fn cornell_box() -> (
     HittableList,
