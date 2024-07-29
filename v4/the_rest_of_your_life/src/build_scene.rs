@@ -1,11 +1,11 @@
 use crate::{
-    bvh::BvhNode,
+    // bvh::BvhNode,
     camera::Camera,
-    constant_medium::ConstantMedium,
-    hittable::{FlipFace, RotateY, Translate},
+    // constant_medium::ConstantMedium,
+    hittable::{RotateY, Translate},
     hittable_list::HittableList,
     material::{Dielectric, DiffuseLight, EmptyMaterial, Lambertian, Metal},
-    // quad::{create_box, Quad},
+    quad::{create_box, Quad},
     rtweekend::{random, random_range, Color, Point3, Vec3},
     sphere::Sphere,
     texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColor},
@@ -81,296 +81,296 @@ pub fn minimul_scene() -> (
     )
 }
 
-// pub fn random_scene() -> (
-//     HittableList,
-//     HittableList,
-//     bool,
-//     Camera,
-//     Color,
-//     usize,
-//     usize,
-// ) {
-//     let mut world = HittableList::new();
+pub fn random_scene() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
+    let mut world = HittableList::new();
 
-//     let checker = Arc::new(CheckerTexture::new(
-//         Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
-//         Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
-//     ));
-//     let ground_material = Arc::new(Lambertian::new(checker));
-//     world.add(Arc::new(Sphere::new(
-//         point3!(0, -1000, 0),
-//         1000.0,
-//         ground_material,
-//     )));
+    let checker = Arc::new(CheckerTexture::new(
+        Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
+        Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
+    ));
+    let ground_material = Arc::new(Lambertian::new(checker));
+    world.add(Arc::new(Sphere::new(
+        point3!(0, -1000, 0),
+        1000.0,
+        ground_material,
+    )));
 
-//     for a in -11..11 {
-//         for b in -11..11 {
-//             let choose_mat = random();
-//             let center = point3!(a as f64 + 0.9 * random(), 0.2, b as f64 + random());
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = random();
+            let center = point3!(a as f64 + 0.9 * random(), 0.2, b as f64 + random());
 
-//             if (center - vec3!(4, 0.2, 0)).length() > 0.9 {
-//                 if choose_mat < 0.8 {
-//                     // diffuse
-//                     let albedo = Color::random() * Color::random();
-//                     let sphere_material =
-//                         Arc::new(Lambertian::new(Arc::new(SolidColor::new(albedo))));
-//                     let center2 = center + vec3!(0, random_range(0.0, 0.5), 0);
-//                     world.add(Arc::new(Sphere::new_with_moving_sphere(
-//                         center,
-//                         center2,
-//                         0.2,
-//                         sphere_material,
-//                     )));
-//                 } else if choose_mat < 0.95 {
-//                     // metal
-//                     let albedo = Color::random_range(0.5, 1.0);
-//                     let fuzz = random();
-//                     let sphere_material = Arc::new(Metal::new(&albedo, fuzz));
-//                     world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
-//                 } else {
-//                     // grass
-//                     let sphere_material = Arc::new(Dielectric::new(1.5));
-//                     world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
-//                 };
-//             }
-//         }
-//     }
+            if (center - vec3!(4, 0.2, 0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    // diffuse
+                    let albedo = Color::random() * Color::random();
+                    let sphere_material =
+                        Arc::new(Lambertian::new(Arc::new(SolidColor::new(albedo))));
+                    let center2 = center + vec3!(0, random_range(0.0, 0.5), 0);
+                    world.add(Arc::new(Sphere::new_with_moving_sphere(
+                        center,
+                        center2,
+                        0.2,
+                        sphere_material,
+                    )));
+                } else if choose_mat < 0.95 {
+                    // metal
+                    let albedo = Color::random_range(0.5, 1.0);
+                    let fuzz = random();
+                    let sphere_material = Arc::new(Metal::new(&albedo, fuzz));
+                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
+                } else {
+                    // grass
+                    let sphere_material = Arc::new(Dielectric::new(1.5));
+                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
+                };
+            }
+        }
+    }
 
-//     let material1 = Arc::new(Dielectric::new(1.5));
-//     world.add(Arc::new(Sphere::new(point3!(0, 1, 0), 1.0, material1)));
-//     let material2 = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
-//         0.4, 0.2, 0.1
-//     )))));
-//     world.add(Arc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material2)));
-//     let material3 = Arc::new(Metal::new(&color!(0.7, 0.6, 0.5), 0.0));
-//     world.add(Arc::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));
+    let material1 = Arc::new(Dielectric::new(1.5));
+    world.add(Arc::new(Sphere::new(point3!(0, 1, 0), 1.0, material1)));
+    let material2 = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.4, 0.2, 0.1
+    )))));
+    world.add(Arc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material2)));
+    let material3 = Arc::new(Metal::new(&color!(0.7, 0.6, 0.5), 0.0));
+    world.add(Arc::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));
 
-//     // ライトの設定
-//     let lights = HittableList::new();
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
-//     // カメラの設定
-//     let aspect_ratio = 16.0 / 9.0;
-//     let image_width = 400;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0.7, 0.8, 1);
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
 
-//     let lookfrom = point3!(13, 2, 3);
-//     let lookat = point3!(0, 0, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.1;
-//     let vfov = 20.0;
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
 
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
 
-//     (
-//         world,
-//         lights,
-//         direct_light_sampling,
-//         cam,
-//         background,
-//         image_width,
-//         image_height,
-//     )
-// }
+    (
+        world,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
+}
 
-// pub fn two_spheres() -> (
-//     HittableList,
-//     HittableList,
-//     bool,
-//     Camera,
-//     Color,
-//     usize,
-//     usize,
-// ) {
-//     let mut hittable_list = HittableList::new();
+pub fn two_spheres() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
+    let mut hittable_list = HittableList::new();
 
-//     let checker = Arc::new(CheckerTexture::new(
-//         Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
-//         Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
-//     ));
+    let checker = Arc::new(CheckerTexture::new(
+        Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
+        Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
+    ));
 
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, -10, 0),
-//         10.0,
-//         Arc::new(Lambertian::new(checker.clone())),
-//     )));
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, 10, 0),
-//         10.0,
-//         Arc::new(Lambertian::new(checker.clone())),
-//     )));
+    hittable_list.add(Arc::new(Sphere::new(
+        point3!(0, -10, 0),
+        10.0,
+        Arc::new(Lambertian::new(checker.clone())),
+    )));
+    hittable_list.add(Arc::new(Sphere::new(
+        point3!(0, 10, 0),
+        10.0,
+        Arc::new(Lambertian::new(checker.clone())),
+    )));
 
-//     // ライトの設定
-//     let lights = HittableList::new();
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
-//     // カメラの設定
-//     let aspect_ratio = 16.0 / 9.0;
-//     let image_width = 400;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0.7, 0.8, 1);
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
 
-//     let lookfrom = point3!(13, 2, 3);
-//     let lookat = point3!(0, 0, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.1;
-//     let vfov = 20.0;
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
 
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
 
-//     (
-//         hittable_list,
-//         lights,
-//         direct_light_sampling,
-//         cam,
-//         background,
-//         image_width,
-//         image_height,
-//     )
-// }
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
+}
 
-// pub fn two_perlin_spheres() -> (
-//     HittableList,
-//     HittableList,
-//     bool,
-//     Camera,
-//     Color,
-//     usize,
-//     usize,
-// ) {
-//     let mut hittable_list = HittableList::new();
+pub fn two_perlin_spheres() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
+    let mut hittable_list = HittableList::new();
 
-//     let pertext = Arc::new(NoiseTexture::new(5.0));
+    let pertext = Arc::new(NoiseTexture::new(5.0));
 
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, -1000, 0),
-//         1000.0,
-//         Arc::new(Lambertian::new(pertext.clone())),
-//     )));
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, 2, 0),
-//         2.0,
-//         Arc::new(Lambertian::new(pertext.clone())),
-//     )));
+    hittable_list.add(Arc::new(Sphere::new(
+        point3!(0, -1000, 0),
+        1000.0,
+        Arc::new(Lambertian::new(pertext.clone())),
+    )));
+    hittable_list.add(Arc::new(Sphere::new(
+        point3!(0, 2, 0),
+        2.0,
+        Arc::new(Lambertian::new(pertext.clone())),
+    )));
 
-//     // ライトの設定
-//     let lights = HittableList::new();
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
-//     // カメラの設定
-//     let aspect_ratio = 16.0 / 9.0;
-//     let image_width = 400;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0.7, 0.8, 1);
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
 
-//     let lookfrom = point3!(13, 2, 3);
-//     let lookat = point3!(0, 0, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.1;
-//     let vfov = 20.0;
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
 
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
 
-//     (
-//         hittable_list,
-//         lights,
-//         direct_light_sampling,
-//         cam,
-//         background,
-//         image_width,
-//         image_height,
-//     )
-// }
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
+}
 
-// pub fn earth() -> (
-//     HittableList,
-//     HittableList,
-//     bool,
-//     Camera,
-//     Color,
-//     usize,
-//     usize,
-// ) {
-//     let image_path = Path::new("./data/earthmap.jpg");
-//     let earth_texture = Arc::new(ImageTexture::new(image_path));
-//     let earth_surface = Arc::new(Lambertian::new(earth_texture));
-//     let globe = Arc::new(Sphere::new(point3!(0, 0, 0), 2.0, earth_surface));
+pub fn earth() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
+    let image_path = Path::new("./data/earthmap.jpg");
+    let earth_texture = Arc::new(ImageTexture::new(image_path));
+    let earth_surface = Arc::new(Lambertian::new(earth_texture));
+    let globe = Arc::new(Sphere::new(point3!(0, 0, 0), 2.0, earth_surface));
 
-//     let hittable_list = HittableList::new_with_object(globe);
+    let hittable_list = HittableList::new_with_object(globe);
 
-//     // ライトの設定
-//     let lights = HittableList::new();
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
-//     // カメラの設定
-//     let aspect_ratio = 16.0 / 9.0;
-//     let image_width = 400;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0.7, 0.8, 1);
+    // カメラの設定
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0.7, 0.8, 1);
 
-//     let lookfrom = point3!(13, 2, 3);
-//     let lookat = point3!(0, 0, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.1;
-//     let vfov = 20.0;
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let vfov = 20.0;
 
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
 
-//     (
-//         hittable_list,
-//         lights,
-//         direct_light_sampling,
-//         cam,
-//         background,
-//         image_width,
-//         image_height,
-//     )
-// }
+    (
+        hittable_list,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
+}
 
 // pub fn simple_light() -> (
 //     HittableList,
@@ -453,137 +453,137 @@ pub fn minimul_scene() -> (
 //     )
 // }
 
-// pub fn cornell_box() -> (
-//     HittableList,
-//     HittableList,
-//     bool,
-//     Camera,
-//     Color,
-//     usize,
-//     usize,
-// ) {
-//     // オブジェクトの設定
-//     let mut world = HittableList::new();
+pub fn cornell_box() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
+    // オブジェクトの設定
+    let mut world = HittableList::new();
 
-//     let red = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
-//         0.65, 0.05, 0.05
-//     )))));
-//     let white = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
-//         0.73, 0.73, 0.73
-//     )))));
-//     let green = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
-//         0.12, 0.45, 0.15
-//     )))));
-//     let light = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
-//         15, 15, 15
-//     )))));
+    let red = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.65, 0.05, 0.05
+    )))));
+    let white = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.73, 0.73, 0.73
+    )))));
+    let green = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.12, 0.45, 0.15
+    )))));
+    let light = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
+        15, 15, 15
+    )))));
 
-//     // Cornell box sides
-//     world.add(Arc::new(Quad::new(
-//         point3!(555, 0, 0),
-//         vec3!(0, 0, 555),
-//         vec3!(0, 555, 0),
-//         green,
-//     )));
-//     world.add(Arc::new(Quad::new(
-//         point3!(0, 0, 555),
-//         vec3!(0, 0, -555),
-//         vec3!(0, 555, 0),
-//         red,
-//     )));
-//     world.add(Arc::new(Quad::new(
-//         point3!(0, 555, 0),
-//         vec3!(555, 0, 0),
-//         vec3!(0, 0, 555),
-//         white.clone(),
-//     )));
-//     world.add(Arc::new(Quad::new(
-//         point3!(0, 0, 555),
-//         vec3!(555, 0, 0),
-//         vec3!(0, 0, -555),
-//         white.clone(),
-//     )));
-//     world.add(Arc::new(Quad::new(
-//         point3!(555, 0, 555),
-//         vec3!(-555, 0, 0),
-//         vec3!(0, 555, 0),
-//         white.clone(),
-//     )));
+    // Cornell box sides
+    world.add(Arc::new(Quad::new(
+        point3!(555, 0, 0),
+        vec3!(0, 0, 555),
+        vec3!(0, 555, 0),
+        green,
+    )));
+    world.add(Arc::new(Quad::new(
+        point3!(0, 0, 555),
+        vec3!(0, 0, -555),
+        vec3!(0, 555, 0),
+        red,
+    )));
+    world.add(Arc::new(Quad::new(
+        point3!(0, 555, 0),
+        vec3!(555, 0, 0),
+        vec3!(0, 0, 555),
+        white.clone(),
+    )));
+    world.add(Arc::new(Quad::new(
+        point3!(0, 0, 555),
+        vec3!(555, 0, 0),
+        vec3!(0, 0, -555),
+        white.clone(),
+    )));
+    world.add(Arc::new(Quad::new(
+        point3!(555, 0, 555),
+        vec3!(-555, 0, 0),
+        vec3!(0, 555, 0),
+        white.clone(),
+    )));
 
-//     // Light
-//     world.add(Arc::new(Quad::new(
-//         point3!(213, 554, 227),
-//         vec3!(130, 0, 0),
-//         vec3!(0, 0, 105),
-//         light,
-//     )));
+    // Light
+    world.add(Arc::new(Quad::new(
+        point3!(213, 554, 227),
+        vec3!(130, 0, 0),
+        vec3!(0, 0, 105),
+        light,
+    )));
 
-//     // Box
-//     let box1 = Arc::new(create_box(
-//         point3!(0, 0, 0),
-//         point3!(165, 330, 165),
-//         white.clone(),
-//     ));
-//     let box1 = Arc::new(RotateY::new(box1, 15.0));
-//     let box1 = Arc::new(Translate::new(box1, vec3!(265, 0, 295)));
-//     world.add(box1);
+    // Box
+    let box1 = Arc::new(create_box(
+        point3!(0, 0, 0),
+        point3!(165, 330, 165),
+        white.clone(),
+    ));
+    let box1 = Arc::new(RotateY::new(box1, 15.0));
+    let box1 = Arc::new(Translate::new(box1, vec3!(265, 0, 295)));
+    world.add(box1);
 
-//     // Grass Sphere
-//     let grass = Arc::new(Dielectric::new(1.5));
-//     let sphere = Arc::new(Sphere::new(point3!(190, 90, 190), 90.0, grass));
-//     world.add(sphere);
+    // Grass Sphere
+    let grass = Arc::new(Dielectric::new(1.5));
+    let sphere = Arc::new(Sphere::new(point3!(190, 90, 190), 90.0, grass));
+    world.add(sphere);
 
-//     // Light source
-//     let empty_material = Arc::new(EmptyMaterial);
-//     let mut lights = HittableList::new();
-//     lights.add(Arc::new(Quad::new(
-//         point3!(343, 554, 332),
-//         vec3!(-130, 0, 0),
-//         vec3!(0, 0, -105),
-//         empty_material.clone(),
-//     )));
-//     lights.add(Arc::new(Sphere::new(
-//         point3!(190, 90, 190),
-//         90.0,
-//         empty_material.clone(),
-//     )));
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    // Light source
+    let empty_material = Arc::new(EmptyMaterial);
+    let mut lights = HittableList::new();
+    lights.add(Arc::new(Quad::new(
+        point3!(343, 554, 332),
+        vec3!(-130, 0, 0),
+        vec3!(0, 0, -105),
+        empty_material.clone(),
+    )));
+    lights.add(Arc::new(Sphere::new(
+        point3!(190, 90, 190),
+        90.0,
+        empty_material.clone(),
+    )));
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
-//     // カメラの設定
-//     let aspect_ratio = 1.0;
-//     let image_width = 500;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0, 0, 0);
+    // カメラの設定
+    let aspect_ratio = 1.0;
+    let image_width = 500;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0, 0, 0);
 
-//     let lookfrom = point3!(278, 278, -800);
-//     let lookat = point3!(278, 278, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.0;
-//     let vfov = 40.0;
+    let lookfrom = point3!(278, 278, -800);
+    let lookat = point3!(278, 278, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 40.0;
 
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
 
-//     (
-//         world,
-//         lights,
-//         direct_light_sampling,
-//         cam,
-//         background,
-//         image_width,
-//         image_height,
-//     )
-// }
+    (
+        world,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
+}
 
 // pub fn cornell_smoke() -> (
 //     HittableList,

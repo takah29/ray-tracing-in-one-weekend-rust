@@ -32,8 +32,8 @@ impl HitRecord {
 
 pub trait Hittable: Sync + Send {
     fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut Aabb) -> bool;
-    fn pdf_value(&self, _origin: &Point3, _v: &Vec3) -> f64 {
+    fn bounding_box(&self) -> Aabb;
+    fn pdf_value(&self, _origin: &Point3, _direction: &Vec3) -> f64 {
         return 0.0;
     }
 
@@ -45,35 +45,33 @@ pub trait Hittable: Sync + Send {
 pub struct Translate {
     obj_ptr: Arc<dyn Hittable>,
     offset: Vec3,
+    bbox: Aabb,
 }
 
 impl Translate {
     pub fn new(obj_ptr: Arc<dyn Hittable>, offset: Vec3) -> Self {
-        Self { obj_ptr, offset }
+        Self {
+            obj_ptr: obj_ptr.clone(),
+            offset,
+            bbox: obj_ptr.bounding_box() + offset,
+        }
     }
 }
 
 impl Hittable for Translate {
     fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
-        let moved_r = Ray::new_with_time(r.orig - self.offset, r.dir, r.time);
-        if !self.obj_ptr.hit(&moved_r, ray_t, rec) {
+        let offset_r = Ray::new_with_time(r.orig - self.offset, r.dir, r.time);
+        if !self.obj_ptr.hit(&offset_r, ray_t, rec) {
             return false;
         }
 
         rec.p += self.offset;
-        rec.set_face_normal(&moved_r, &rec.normal.clone());
 
         true
     }
 
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut Aabb) -> bool {
-        if !self.obj_ptr.bounding_box(t0, t1, output_box) {
-            return false;
-        }
-
-        *output_box = *output_box + self.offset;
-
-        true
+    fn bounding_box(&self) -> Aabb {
+        self.bbox
     }
 }
 
@@ -81,7 +79,6 @@ pub struct RotateY {
     obj_ptr: Arc<dyn Hittable>,
     sin_theta: f64,
     cos_theta: f64,
-    hasbox: bool,
     bbox: Aabb,
 }
 
@@ -90,12 +87,11 @@ impl RotateY {
         let radians = angle.to_radians();
         let sin_theta = radians.sin();
         let cos_theta = radians.cos();
-
-        let mut bbox = Aabb::new_with_empty();
-        let hasbox = obj_ptr.bounding_box(0.0, 1.0, &mut bbox);
+        let bbox = obj_ptr.bounding_box();
 
         let mut min = point3!(INFINITY, INFINITY, INFINITY);
         let mut max = point3!(-INFINITY, -INFINITY, -INFINITY);
+
         for i in 0..=1 {
             for j in 0..=1 {
                 for k in 0..=1 {
@@ -120,7 +116,6 @@ impl RotateY {
             obj_ptr,
             sin_theta,
             cos_theta,
-            hasbox,
             bbox: Aabb::new_with_points(min, max),
         }
     }
@@ -133,6 +128,7 @@ impl Hittable for RotateY {
 
         origin.e[0] = self.cos_theta * r.orig.e[0] - self.sin_theta * r.orig.e[2];
         origin.e[2] = self.sin_theta * r.orig.e[0] + self.cos_theta * r.orig.e[2];
+
         direction.e[0] = self.cos_theta * r.dir.e[0] - self.sin_theta * r.dir.e[2];
         direction.e[2] = self.sin_theta * r.dir.e[0] + self.cos_theta * r.dir.e[2];
 
@@ -143,23 +139,21 @@ impl Hittable for RotateY {
         }
 
         let mut p = rec.p;
-        let mut normal = rec.normal;
-
         p.e[0] = self.cos_theta * rec.p.e[0] + self.sin_theta * rec.p.e[2];
         p.e[2] = -self.sin_theta * rec.p.e[0] + self.cos_theta * rec.p.e[2];
 
+        let mut normal = rec.normal;
         normal.e[0] = self.cos_theta * rec.normal.e[0] + self.sin_theta * rec.normal.e[2];
         normal.e[2] = -self.sin_theta * rec.normal.e[0] + self.cos_theta * rec.normal.e[2];
 
         rec.p = p;
-        rec.set_face_normal(&rotated_r, &normal);
+        rec.normal = normal;
 
         true
     }
 
-    fn bounding_box(&self, _: f64, _: f64, output_box: &mut Aabb) -> bool {
-        *output_box = self.bbox.clone();
-        self.hasbox
+    fn bounding_box(&self) -> Aabb {
+        self.bbox
     }
 }
 
@@ -170,20 +164,5 @@ pub struct FlipFace {
 impl FlipFace {
     pub fn new(obj_ptr: Arc<dyn Hittable>) -> Self {
         Self { obj_ptr }
-    }
-}
-
-impl Hittable for FlipFace {
-    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
-        if !self.obj_ptr.hit(r, ray_t, rec) {
-            return false;
-        }
-
-        rec.front_face = !rec.front_face;
-        true
-    }
-
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut Aabb) -> bool {
-        self.obj_ptr.bounding_box(t0, t1, output_box)
     }
 }

@@ -8,12 +8,14 @@ use std::sync::Arc;
 
 pub struct HittableList {
     pub objects: Vec<Arc<dyn Hittable>>,
+    bbox: Aabb,
 }
 
 impl HittableList {
     pub fn new() -> Self {
-        HittableList {
+        Self {
             objects: Vec::new(),
+            bbox: Aabb::new_with_empty(),
         }
     }
 
@@ -24,11 +26,13 @@ impl HittableList {
     }
 
     pub fn add(&mut self, object: Arc<dyn Hittable>) {
-        self.objects.push(object);
+        self.objects.push(object.clone());
+        self.bbox = Aabb::from_boxes(self.bbox, object.bounding_box());
     }
 
     pub fn clear(&mut self) {
         self.objects.clear();
+        self.bbox = Aabb::new_with_empty();
     }
 }
 
@@ -48,27 +52,8 @@ impl Hittable for HittableList {
         hit_anything
     }
 
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut crate::aabb::Aabb) -> bool {
-        if self.objects.is_empty() {
-            return false;
-        }
-
-        let mut temp_box = Aabb::new_with_empty();
-        let mut first_box = true;
-
-        for object in &self.objects {
-            if !object.bounding_box(t0, t1, &mut temp_box) {
-                return false;
-            }
-            *output_box = if first_box {
-                temp_box.clone()
-            } else {
-                Aabb::from_boxes(output_box.clone(), temp_box.clone())
-            };
-            first_box = false;
-        }
-
-        true
+    fn bounding_box(&self) -> Aabb {
+        self.bbox
     }
 
     fn pdf_value(&self, origin: &crate::vec3::Point3, v: &crate::vec3::Vec3) -> f64 {

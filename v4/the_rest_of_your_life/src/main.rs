@@ -2,8 +2,8 @@ use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use std::sync::Arc;
 use the_rest_of_your_life::{
-    build_scene::minimul_scene,
-    bvh::BvhNode,
+    build_scene::cornell_box,
+    // bvh::BvhNode,
     color,
     hittable::{HitRecord, Hittable},
     interval::Interval,
@@ -103,7 +103,7 @@ fn main() {
         background,
         image_width,
         image_height,
-    ) = minimul_scene();
+    ) = cornell_box();
     let world: Box<dyn Hittable> = Box::new(hittable_list);
     // let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
     let lights: Arc<dyn Hittable> = Arc::new(lights);
