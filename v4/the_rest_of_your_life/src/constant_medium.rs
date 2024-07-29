@@ -1,6 +1,7 @@
 use crate::{
     aabb::AABB,
     hittable::{HitRecord, Hittable},
+    interval::Interval,
     material::Isotropic,
     material::Material,
     rtweekend::{random, Ray, Vec3, INFINITY},
@@ -26,18 +27,21 @@ impl ConstantMedium {
 }
 
 impl Hittable for ConstantMedium {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let enable_debug = false;
         let debugging = enable_debug && random() < 0.00001;
 
         let mut rec1 = HitRecord::default();
         let mut rec2 = HitRecord::default();
 
-        if !self.boundary.hit(r, -INFINITY, INFINITY, &mut rec1) {
+        if !self.boundary.hit(r, Interval::UNIVERSE, &mut rec1) {
             return false;
         }
 
-        if !self.boundary.hit(r, rec1.t + 0.0001, INFINITY, &mut rec2) {
+        if !self
+            .boundary
+            .hit(r, Interval::new(rec1.t + 0.0001, INFINITY), &mut rec2)
+        {
             return false;
         }
 
@@ -45,11 +49,11 @@ impl Hittable for ConstantMedium {
             eprintln!("\nt0={}, t1={}", rec1.t, rec2.t)
         };
 
-        if rec1.t < t_min {
-            rec1.t = t_min
+        if rec1.t < ray_t.min {
+            rec1.t = ray_t.min
         };
-        if rec2.t > t_max {
-            rec2.t = t_max
+        if rec2.t > ray_t.max {
+            rec2.t = ray_t.max
         };
 
         if rec1.t >= rec2.t {

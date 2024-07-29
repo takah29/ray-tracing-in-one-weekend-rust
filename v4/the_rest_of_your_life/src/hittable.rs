@@ -1,5 +1,6 @@
 use crate::{
     aabb::AABB,
+    interval::Interval,
     material::Material,
     point3,
     rtweekend::{Point3, Ray, Vec3, INFINITY},
@@ -30,7 +31,7 @@ impl HitRecord {
 }
 
 pub trait Hittable: Sync + Send {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
     fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut AABB) -> bool;
     fn pdf_value(&self, _origin: &Point3, _v: &Vec3) -> f64 {
         return 0.0;
@@ -53,9 +54,9 @@ impl Translate {
 }
 
 impl Hittable for Translate {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let moved_r = Ray::new_with_time(r.orig - self.offset, r.dir, r.time);
-        if !self.obj_ptr.hit(&moved_r, t_min, t_max, rec) {
+        if !self.obj_ptr.hit(&moved_r, ray_t, rec) {
             return false;
         }
 
@@ -124,7 +125,7 @@ impl RotateY {
 }
 
 impl Hittable for RotateY {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let mut origin = r.orig.clone();
         let mut direction = r.dir.clone();
 
@@ -135,7 +136,7 @@ impl Hittable for RotateY {
 
         let rotated_r = Ray::new_with_time(origin, direction, r.time);
 
-        if !self.obj_ptr.hit(&rotated_r, t_min, t_max, rec) {
+        if !self.obj_ptr.hit(&rotated_r, ray_t, rec) {
             return false;
         }
 
@@ -171,8 +172,8 @@ impl FlipFace {
 }
 
 impl Hittable for FlipFace {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        if !self.obj_ptr.hit(r, t_min, t_max, rec) {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
+        if !self.obj_ptr.hit(r, ray_t, rec) {
             return false;
         }
 

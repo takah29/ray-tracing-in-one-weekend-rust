@@ -6,6 +6,7 @@ use the_rest_of_your_life::{
     bvh::BvhNode,
     color,
     hittable::{HitRecord, Hittable},
+    interval::Interval,
     material::ScatterRecord,
     pdf::{HittablePdf, MixturePdf, Pdf},
     ray::Ray,
@@ -27,7 +28,7 @@ fn ray_color(
         return color!(0, 0, 0);
     }
 
-    if !world.hit(&r, 0.001, INFINITY, &mut rec) {
+    if !world.hit(&r, Interval::new(0.001, INFINITY), &mut rec) {
         return *background;
     }
 

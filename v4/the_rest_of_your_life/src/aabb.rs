@@ -1,5 +1,8 @@
-use crate::point3;
-use crate::rtweekend::{Point3, Ray, INFINITY};
+use crate::{
+    interval::Interval,
+    point3,
+    rtweekend::{Point3, Ray, INFINITY},
+};
 
 #[derive(Clone)]
 pub struct AABB {
@@ -19,7 +22,7 @@ impl AABB {
         )
     }
 
-    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {
+    pub fn hit(&self, r: &Ray, ray_t: Interval) -> bool {
         for axis_num in 0..3 {
             let inv_d = 1.0 / r.dir.e[axis_num];
             let mut t0 = (self.min.e[axis_num] - r.orig.e[axis_num]) * inv_d;
@@ -27,8 +30,8 @@ impl AABB {
             if inv_d < 0.0 {
                 (t0, t1) = (t1, t0);
             }
-            let t_min = if t0 > t_min { t0 } else { t_min };
-            let t_max = if t1 < t_max { t1 } else { t_max };
+            let t_min = if t0 > ray_t.min { t0 } else { ray_t.min };
+            let t_max = if t1 < ray_t.max { t1 } else { ray_t.max };
             if t_max <= t_min {
                 return false;
             }

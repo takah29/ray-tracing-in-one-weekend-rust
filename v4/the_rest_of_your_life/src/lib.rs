@@ -7,6 +7,7 @@ pub mod constant_medium;
 pub mod cuboid;
 pub mod hittable;
 pub mod hittable_list;
+pub mod interval;
 pub mod material;
 pub mod moving_sphere;
 pub mod onb;

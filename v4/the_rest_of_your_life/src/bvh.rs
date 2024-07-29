@@ -2,6 +2,7 @@ use crate::{
     aabb::{surrounding_box, AABB},
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
+    interval::Interval,
     rtweekend::{random_int, Ray},
 };
 use std::cmp::Ordering;
@@ -71,15 +72,17 @@ impl BvhNode {
 }
 
 impl Hittable for BvhNode {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        if !self.bbox.hit(r, t_min, t_max) {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
+        if !self.bbox.hit(r, ray_t) {
             return false;
         }
 
-        let hit_left = self.left.hit(r, t_min, t_max, rec);
-        let hit_right = self
-            .right
-            .hit(r, t_min, if hit_left { rec.t } else { t_max }, rec);
+        let hit_left = self.left.hit(r, ray_t, rec);
+        let hit_right = self.right.hit(
+            r,
+            Interval::new(ray_t.min, if hit_left { rec.t } else { ray_t.max }),
+            rec,
+        );
 
         hit_left || hit_right
     }

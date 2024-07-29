@@ -1,5 +1,6 @@
 use crate::aabb::{surrounding_box, AABB};
 use crate::hittable::{HitRecord, Hittable};
+use crate::interval::Interval;
 use crate::material::Material;
 use crate::rtweekend::{Point3, Ray, Vec3};
 use crate::vec3;
@@ -40,7 +41,7 @@ impl MovingSphere {
 }
 
 impl Hittable for MovingSphere {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let oc = r.orig - self.center(r.time);
         let a = r.dir.length_squared();
         let half_b = oc.dot(r.dir);
@@ -52,7 +53,7 @@ impl Hittable for MovingSphere {
             let temp = (-half_b - root) / a;
 
             // 値が小さい方のt
-            if t_min < temp && temp < t_max {
+            if ray_t.min < temp && temp < ray_t.max {
                 rec.t = temp;
                 rec.p = r.at(rec.t);
                 let outward_normal = (rec.p - self.center(r.time)) / self.radius;
@@ -64,7 +65,7 @@ impl Hittable for MovingSphere {
             let temp = (-half_b + root) / a;
 
             // 値が大きい方のt
-            if t_min < temp && temp < t_max {
+            if ray_t.min < temp && temp < ray_t.max {
                 rec.t = temp;
                 rec.p = r.at(rec.t);
                 let outward_normal = (rec.p - self.center(r.time)) / self.radius;

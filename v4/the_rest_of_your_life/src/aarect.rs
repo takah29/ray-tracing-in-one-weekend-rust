@@ -1,6 +1,7 @@
 use crate::{
     aabb::AABB,
     hittable::{HitRecord, Hittable},
+    interval::Interval,
     material::Material,
     rtweekend::{random_range, Point3, Ray, Vec3, INFINITY},
     {point3, vec3},
@@ -30,9 +31,9 @@ impl XyRect {
 }
 
 impl Hittable for XyRect {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let t = (self.k - r.orig.e[2]) / r.dir.e[2];
-        if t < t_min || t_max < t {
+        if t < ray_t.min || ray_t.max < t {
             return false;
         }
         let x = r.orig.e[0] + t * r.dir.e[0];
@@ -83,9 +84,9 @@ impl XzRect {
 }
 
 impl Hittable for XzRect {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let t = (self.k - r.orig.e[1]) / r.dir.e[1];
-        if t < t_min || t_max < t {
+        if t < ray_t.min || ray_t.max < t {
             return false;
         }
         let x = r.orig.e[0] + t * r.dir.e[0];
@@ -114,7 +115,11 @@ impl Hittable for XzRect {
 
     fn pdf_value(&self, origin: &Point3, v: &Vec3) -> f64 {
         let mut rec = HitRecord::default();
-        if !self.hit(&Ray::new(*origin, *v), 0.001, INFINITY, &mut rec) {
+        if !self.hit(
+            &Ray::new(*origin, *v),
+            Interval::new(0.001, INFINITY),
+            &mut rec,
+        ) {
             return 0.0;
         }
 
@@ -158,9 +163,9 @@ impl YzRect {
 }
 
 impl Hittable for YzRect {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let t = (self.k - r.orig.e[0]) / r.dir.e[0];
-        if t < t_min || t_max < t {
+        if t < ray_t.min || ray_t.max < t {
             return false;
         }
         let y = r.orig.e[1] + t * r.dir.e[1];

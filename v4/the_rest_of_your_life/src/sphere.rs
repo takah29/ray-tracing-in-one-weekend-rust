@@ -1,6 +1,7 @@
 use crate::{
     aabb::AABB,
     hittable::{HitRecord, Hittable},
+    interval::Interval,
     material::Material,
     onb::Onb,
     rtweekend::{Point3, Ray, Vec3, PI},
@@ -27,7 +28,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let oc = r.orig - self.center;
         let a = r.dir.length_squared();
         let half_b = oc.dot(r.dir);
@@ -39,7 +40,7 @@ impl Hittable for Sphere {
             let temp = (-half_b - root) / a;
 
             // 値が小さい方のt
-            if t_min < temp && temp < t_max {
+            if ray_t.min < temp && temp < ray_t.max {
                 rec.t = temp;
                 rec.p = r.at(rec.t);
                 let outward_normal = (rec.p - self.center) / self.radius;
@@ -52,7 +53,7 @@ impl Hittable for Sphere {
             let temp = (-half_b + root) / a;
 
             // 値が大きい方のt
-            if t_min < temp && temp < t_max {
+            if ray_t.min < temp && temp < ray_t.max {
                 rec.t = temp;
                 rec.p = r.at(rec.t);
                 let outward_normal = (rec.p - self.center) / self.radius;
@@ -75,7 +76,11 @@ impl Hittable for Sphere {
 
     fn pdf_value(&self, origin: &Point3, v: &Vec3) -> f64 {
         let mut rec = HitRecord::default();
-        if !self.hit(&Ray::new(*origin, *v), 0.001, INFINITY, &mut rec) {
+        if !self.hit(
+            &Ray::new(*origin, *v),
+            Interval::new(0.001, INFINITY),
+            &mut rec,
+        ) {
             return 0.0;
         }
 

@@ -3,6 +3,7 @@ use crate::{
     aarect::{XyRect, XzRect, YzRect},
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
+    interval::Interval,
     material::Material,
     rtweekend::{Point3, Ray},
 };
@@ -81,8 +82,8 @@ impl Cuboid {
 }
 
 impl Hittable for Cuboid {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        self.sides.hit(r, t_min, t_max, rec)
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
+        self.sides.hit(r, ray_t, rec)
     }
 
     fn bounding_box(&self, _: f64, _: f64, output_box: &mut AABB) -> bool {
