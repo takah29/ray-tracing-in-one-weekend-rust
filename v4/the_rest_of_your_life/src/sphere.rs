@@ -91,7 +91,7 @@ impl Hittable for Sphere {
         let distance_squared = direction.length_squared();
         let uvw = Onb::build_from_w(direction);
 
-        uvw.local_vec3(random_to_sphere(self.radius, distance_squared))
+        uvw.transform_vec3(random_to_sphere(self.radius, distance_squared))
     }
 }
 

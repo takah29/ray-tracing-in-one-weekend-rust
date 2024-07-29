@@ -35,11 +35,11 @@ impl Onb {
         self.axis[2]
     }
 
-    pub fn local(&self, a: f64, b: f64, c: f64) -> Vec3 {
+    pub fn transform(&self, a: f64, b: f64, c: f64) -> Vec3 {
         a * self[0] + b * self[1] + c * self[2]
     }
 
-    pub fn local_vec3(&self, v: Vec3) -> Vec3 {
+    pub fn transform_vec3(&self, v: Vec3) -> Vec3 {
         v.e[0] * self[0] + v.e[1] * self[1] + v.e[2] * self[2]
     }
 }

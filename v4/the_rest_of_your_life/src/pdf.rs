@@ -34,7 +34,7 @@ impl Pdf for CosinePdf {
     }
 
     fn generate(&self) -> Vec3 {
-        self.uvw.local_vec3(random_cosine_direction())
+        self.uvw.transform_vec3(random_cosine_direction())
     }
 }
 

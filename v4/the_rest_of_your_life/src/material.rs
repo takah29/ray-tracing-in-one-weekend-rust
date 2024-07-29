@@ -3,17 +3,17 @@ use crate::{
     hittable::HitRecord,
     pdf::{CosinePdf, Pdf, SpherePdf},
     rtweekend::{random, Color, Point3, Ray, PI},
-    texture::Texture,
+    texture::{SolidColor, Texture},
     vec3::{random_in_unit_sphere, reflect, refract},
 };
 use std::sync::Arc;
 
 #[derive(Default, Clone)]
 pub struct ScatterRecord {
-    pub specular_ray: Ray,
-    pub is_specular: bool,
     pub attenuation: Color,
     pub opt_pdf_ptr: Option<Arc<dyn Pdf>>,
+    pub skip_pdf: bool,
+    pub skip_pdf_ray: Ray,
 }
 
 pub trait Material: Sync + Send {
@@ -42,7 +42,7 @@ impl Lambertian {
 
 impl Material for Lambertian {
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
-        srec.is_specular = false;
+        srec.skip_pdf = false;
         srec.attenuation = self.albedo.value(rec.u, rec.v, &rec.p);
         srec.opt_pdf_ptr = Some(Arc::new(CosinePdf::new(&rec.normal)));
         true
@@ -75,13 +75,13 @@ impl Metal {
 impl Material for Metal {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
         let reflected = reflect(&r_in.dir.unit(), &rec.normal);
-        srec.specular_ray = Ray::new_with_time(
+        srec.skip_pdf_ray = Ray::new_with_time(
             rec.p,
             reflected + self.fuzz * random_in_unit_sphere(),
             r_in.time,
         );
         srec.attenuation = self.albedo;
-        srec.is_specular = true;
+        srec.skip_pdf = true;
         srec.opt_pdf_ptr = None;
         true
     }
@@ -99,7 +99,7 @@ impl Dielectric {
 
 impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
-        srec.is_specular = true;
+        srec.skip_pdf = true;
         srec.opt_pdf_ptr = None;
         srec.attenuation = color!(1, 1, 1);
         let etai_over_etat = if rec.front_face {
@@ -113,17 +113,17 @@ impl Material for Dielectric {
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
         if etai_over_etat * sin_theta > 1.0 {
             let reflected = reflect(&unit_direction, &rec.normal);
-            srec.specular_ray = Ray::new_with_time(rec.p, reflected, r_in.time);
+            srec.skip_pdf_ray = Ray::new_with_time(rec.p, reflected, r_in.time);
             return true;
         }
         let reflect_prob = schlick(cos_theta, etai_over_etat);
         if random() < reflect_prob {
             let reflected = reflect(&unit_direction, &rec.normal);
-            srec.specular_ray = Ray::new_with_time(rec.p, reflected, r_in.time);
+            srec.skip_pdf_ray = Ray::new_with_time(rec.p, reflected, r_in.time);
             return true;
         }
         let refracted = refract(&unit_direction, &rec.normal, etai_over_etat);
-        srec.specular_ray = Ray::new_with_time(rec.p, refracted, r_in.time);
+        srec.skip_pdf_ray = Ray::new_with_time(rec.p, refracted, r_in.time);
         true
     }
 }
@@ -154,19 +154,25 @@ fn schlick(cosine: f64, ref_idx: f64) -> f64 {
 }
 
 pub struct Isotropic {
-    albedo: Arc<dyn Texture>,
+    tex: Arc<dyn Texture>,
 }
 
 impl Isotropic {
-    pub fn new(albedo: Arc<dyn Texture>) -> Self {
-        Self { albedo }
+    pub fn new(tex: Arc<dyn Texture>) -> Self {
+        Self { tex }
+    }
+
+    pub fn new_with_color(albedo: Color) -> Self {
+        Self {
+            tex: Arc::new(SolidColor::new(albedo)),
+        }
     }
 }
 
 impl Material for Isotropic {
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
         srec.opt_pdf_ptr = Some(Arc::new(SpherePdf));
-        srec.attenuation = self.albedo.value(rec.u, rec.v, &rec.p);
+        srec.attenuation = self.tex.value(rec.u, rec.v, &rec.p);
 
         true
     }
@@ -175,3 +181,6 @@ impl Material for Isotropic {
         1.0 / (4.0 * PI)
     }
 }
+
+pub struct EmptyMaterial;
+impl Material for EmptyMaterial {}

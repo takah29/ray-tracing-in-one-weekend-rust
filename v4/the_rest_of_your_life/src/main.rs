@@ -47,10 +47,10 @@ fn ray_color(
         return emitted;
     }
 
-    if srec.is_specular {
+    if srec.skip_pdf {
         return srec.attenuation
             * ray_color(
-                srec.specular_ray,
+                srec.skip_pdf_ray,
                 background,
                 world,
                 lights,
