@@ -1,5 +1,5 @@
 use crate::{
-    aabb::{surrounding_box, AABB},
+    aabb::Aabb,
     hittable::{HitRecord, Hittable},
     interval::Interval,
     rtweekend::{random_int, Ray, Vec3},
@@ -48,12 +48,12 @@ impl Hittable for HittableList {
         hit_anything
     }
 
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut crate::aabb::AABB) -> bool {
+    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut crate::aabb::Aabb) -> bool {
         if self.objects.is_empty() {
             return false;
         }
 
-        let mut temp_box = AABB::new_with_empty();
+        let mut temp_box = Aabb::new_with_empty();
         let mut first_box = true;
 
         for object in &self.objects {
@@ -63,7 +63,7 @@ impl Hittable for HittableList {
             *output_box = if first_box {
                 temp_box.clone()
             } else {
-                surrounding_box(output_box.clone(), temp_box.clone())
+                Aabb::from_boxes(output_box.clone(), temp_box.clone())
             };
             first_box = false;
         }

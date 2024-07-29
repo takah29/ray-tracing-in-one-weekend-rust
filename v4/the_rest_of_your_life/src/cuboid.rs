@@ -1,5 +1,5 @@
 use crate::{
-    aabb::AABB,
+    aabb::Aabb,
     aarect::{XyRect, XzRect, YzRect},
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
@@ -86,8 +86,8 @@ impl Hittable for Cuboid {
         self.sides.hit(r, ray_t, rec)
     }
 
-    fn bounding_box(&self, _: f64, _: f64, output_box: &mut AABB) -> bool {
-        *output_box = AABB::new(self.box_min, self.box_max);
+    fn bounding_box(&self, _: f64, _: f64, output_box: &mut Aabb) -> bool {
+        *output_box = Aabb::new_with_points(self.box_min, self.box_max);
         true
     }
 }

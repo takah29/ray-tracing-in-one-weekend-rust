@@ -1,5 +1,5 @@
 use crate::{
-    aabb::AABB,
+    aabb::Aabb,
     hittable::{HitRecord, Hittable},
     interval::Interval,
     material::Isotropic,
@@ -89,7 +89,7 @@ impl Hittable for ConstantMedium {
         true
     }
 
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut AABB) -> bool {
+    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut Aabb) -> bool {
         self.boundary.bounding_box(t0, t1, output_box)
     }
 }

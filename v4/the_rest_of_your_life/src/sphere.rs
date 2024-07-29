@@ -1,5 +1,5 @@
 use crate::{
-    aabb::AABB,
+    aabb::Aabb,
     hittable::{HitRecord, Hittable},
     interval::Interval,
     material::Material,
@@ -66,8 +66,8 @@ impl Hittable for Sphere {
         false
     }
 
-    fn bounding_box(&self, _: f64, _: f64, output_box: &mut AABB) -> bool {
-        *output_box = AABB::new(
+    fn bounding_box(&self, _: f64, _: f64, output_box: &mut Aabb) -> bool {
+        *output_box = Aabb::new_with_points(
             self.center - vec3!(self.radius, self.radius, self.radius),
             self.center + vec3!(self.radius, self.radius, self.radius),
         );

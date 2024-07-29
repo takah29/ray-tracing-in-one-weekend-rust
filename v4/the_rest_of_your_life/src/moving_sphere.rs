@@ -1,4 +1,4 @@
-use crate::aabb::{surrounding_box, AABB};
+use crate::aabb::Aabb;
 use crate::hittable::{HitRecord, Hittable};
 use crate::interval::Interval;
 use crate::material::Material;
@@ -77,17 +77,17 @@ impl Hittable for MovingSphere {
         false
     }
 
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut AABB) -> bool {
-        let box0 = AABB::new(
+    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut Aabb) -> bool {
+        let box0 = Aabb::new_with_points(
             self.center(t0) - vec3!(self.radius, self.radius, self.radius),
             self.center(t0) + vec3!(self.radius, self.radius, self.radius),
         );
-        let box1 = AABB::new(
+        let box1 = Aabb::new_with_points(
             self.center(t1) - vec3!(self.radius, self.radius, self.radius),
             self.center(t1) + vec3!(self.radius, self.radius, self.radius),
         );
 
-        *output_box = surrounding_box(box0, box1);
+        *output_box = Aabb::from_boxes(box0, box1);
 
         true
     }

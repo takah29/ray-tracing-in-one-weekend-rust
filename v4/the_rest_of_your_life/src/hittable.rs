@@ -1,5 +1,5 @@
 use crate::{
-    aabb::AABB,
+    aabb::Aabb,
     interval::Interval,
     material::Material,
     point3,
@@ -32,7 +32,7 @@ impl HitRecord {
 
 pub trait Hittable: Sync + Send {
     fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut AABB) -> bool;
+    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut Aabb) -> bool;
     fn pdf_value(&self, _origin: &Point3, _v: &Vec3) -> f64 {
         return 0.0;
     }
@@ -66,12 +66,12 @@ impl Hittable for Translate {
         true
     }
 
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut AABB) -> bool {
+    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut Aabb) -> bool {
         if !self.obj_ptr.bounding_box(t0, t1, output_box) {
             return false;
         }
 
-        *output_box = AABB::new(output_box.min + self.offset, output_box.max + self.offset);
+        *output_box = *output_box + self.offset;
 
         true
     }
@@ -82,7 +82,7 @@ pub struct RotateY {
     sin_theta: f64,
     cos_theta: f64,
     hasbox: bool,
-    bbox: AABB,
+    bbox: Aabb,
 }
 
 impl RotateY {
@@ -91,7 +91,7 @@ impl RotateY {
         let sin_theta = radians.sin();
         let cos_theta = radians.cos();
 
-        let mut bbox = AABB::new_with_empty();
+        let mut bbox = Aabb::new_with_empty();
         let hasbox = obj_ptr.bounding_box(0.0, 1.0, &mut bbox);
 
         let mut min = point3!(INFINITY, INFINITY, INFINITY);
@@ -99,16 +99,18 @@ impl RotateY {
         for i in 0..=1 {
             for j in 0..=1 {
                 for k in 0..=1 {
-                    let zero_one_vec = point3!(i, j, k);
-                    let p = zero_one_vec * bbox.max + (1.0 - zero_one_vec) * bbox.min;
-                    let newx = cos_theta * p.e[0] + sin_theta * p.e[2];
-                    let newz = -sin_theta * p.e[0] + cos_theta * p.e[2];
+                    let x = i as f64 * bbox.x.max + (1 - i) as f64 * bbox.x.min;
+                    let y = j as f64 * bbox.y.max + (1 - j) as f64 * bbox.y.min;
+                    let z = k as f64 * bbox.z.max + (1 - k) as f64 * bbox.z.min;
 
-                    let tester = point3!(newx, p.e[1], newz);
+                    let newx = cos_theta * x + sin_theta * z;
+                    let newz = -sin_theta * x + cos_theta * z;
+
+                    let tester = point3!(newx, y, newz);
 
                     for c in 0..3 {
-                        min.e[c] = bbox.min.e[c].min(tester.e[c]);
-                        max.e[c] = bbox.max.e[c].max(tester.e[c]);
+                        min.e[c] = min.e[c].min(tester.e[c]);
+                        max.e[c] = max.e[c].max(tester.e[c]);
                     }
                 }
             }
@@ -119,7 +121,7 @@ impl RotateY {
             sin_theta,
             cos_theta,
             hasbox,
-            bbox: AABB::new(min, max),
+            bbox: Aabb::new_with_points(min, max),
         }
     }
 }
@@ -155,7 +157,7 @@ impl Hittable for RotateY {
         true
     }
 
-    fn bounding_box(&self, _: f64, _: f64, output_box: &mut AABB) -> bool {
+    fn bounding_box(&self, _: f64, _: f64, output_box: &mut Aabb) -> bool {
         *output_box = self.bbox.clone();
         self.hasbox
     }
@@ -181,7 +183,7 @@ impl Hittable for FlipFace {
         true
     }
 
-    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut AABB) -> bool {
+    fn bounding_box(&self, t0: f64, t1: f64, output_box: &mut Aabb) -> bool {
         self.obj_ptr.bounding_box(t0, t1, output_box)
     }
 }

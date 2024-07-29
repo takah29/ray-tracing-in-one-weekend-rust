@@ -1,5 +1,5 @@
 use crate::{
-    aabb::AABB,
+    aabb::Aabb,
     hittable::{HitRecord, Hittable},
     interval::Interval,
     material::Material,
@@ -52,8 +52,8 @@ impl Hittable for XyRect {
         true
     }
 
-    fn bounding_box(&self, _: f64, _: f64, output_box: &mut AABB) -> bool {
-        *output_box = AABB::new(
+    fn bounding_box(&self, _: f64, _: f64, output_box: &mut Aabb) -> bool {
+        *output_box = Aabb::new_with_points(
             point3!(self.x0, self.y0, self.k - 0.0001),
             point3!(self.x1, self.y1, self.k + 0.0001),
         );
@@ -105,8 +105,8 @@ impl Hittable for XzRect {
         true
     }
 
-    fn bounding_box(&self, _: f64, _: f64, output_box: &mut AABB) -> bool {
-        *output_box = AABB::new(
+    fn bounding_box(&self, _: f64, _: f64, output_box: &mut Aabb) -> bool {
+        *output_box = Aabb::new_with_points(
             point3!(self.x0, self.k - 0.0001, self.z0),
             point3!(self.x1, self.k + 0.0001, self.z1),
         );
@@ -184,8 +184,8 @@ impl Hittable for YzRect {
         true
     }
 
-    fn bounding_box(&self, _: f64, _: f64, output_box: &mut AABB) -> bool {
-        *output_box = AABB::new(
+    fn bounding_box(&self, _: f64, _: f64, output_box: &mut Aabb) -> bool {
+        *output_box = Aabb::new_with_points(
             point3!(self.k - 0.0001, self.y0, self.z0),
             point3!(self.k + 0.0001, self.y1, self.z1),
         );
