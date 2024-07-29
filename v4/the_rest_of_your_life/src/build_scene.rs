@@ -715,167 +715,158 @@ pub fn cornell_smoke() -> (
     )
 }
 
-// pub fn final_scene() -> (
-//     HittableList,
-//     HittableList,
-//     bool,
-//     Camera,
-//     Color,
-//     usize,
-//     usize,
-// ) {
-//     let mut boxes1 = HittableList::new();
-//     let ground = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
-//         0.48, 0.83, 0.53
-//     )))));
+pub fn final_scene() -> (
+    HittableList,
+    HittableList,
+    bool,
+    Camera,
+    Color,
+    usize,
+    usize,
+) {
+    let mut boxes1 = HittableList::new();
+    let ground = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.48, 0.83, 0.53
+    )))));
 
-//     let boxes_per_side = 20;
-//     for i in 0..boxes_per_side {
-//         for j in 0..boxes_per_side {
-//             let w = 100.0;
-//             let x0 = -1000.0 + i as f64 * w;
-//             let z0 = -1000.0 + j as f64 * w;
-//             let y0 = 0.0;
-//             let x1 = x0 + w;
-//             let y1 = random_range(1.0, 101.0);
-//             let z1 = z0 + w;
+    let boxes_per_side = 20;
+    for i in 0..boxes_per_side {
+        for j in 0..boxes_per_side {
+            let w = 100.0;
+            let x0 = -1000.0 + i as f64 * w;
+            let z0 = -1000.0 + j as f64 * w;
+            let y0 = 0.0;
+            let x1 = x0 + w;
+            let y1 = random_range(1.0, 101.0);
+            let z1 = z0 + w;
 
-//             boxes1.add(Arc::new(Cuboid::new(
-//                 point3!(x0, y0, z0),
-//                 point3!(x1, y1, z1),
-//                 ground.clone(),
-//             )));
-//         }
-//     }
+            boxes1.add(Arc::new(create_box(
+                point3!(x0, y0, z0),
+                point3!(x1, y1, z1),
+                ground.clone(),
+            )));
+        }
+    }
 
-//     let mut hittable_list = HittableList::new();
+    let mut world = HittableList::new();
 
-//     hittable_list.add(Arc::new(BvhNode::new_with_list(&mut boxes1, 0.0, 1.0)));
+    world.add(Arc::new(BvhNode::new_with_list(&mut boxes1, 0.0, 1.0)));
 
-//     let light = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
-//         7, 7, 7
-//     )))));
-//     hittable_list.add(Arc::new(FlipFace::new(Arc::new(XzRect::new(
-//         123.0, 423.0, 147.0, 412.0, 554.0, light,
-//     )))));
+    let light = Arc::new(DiffuseLight::new(Arc::new(SolidColor::new(color!(
+        7, 7, 7
+    )))));
+    world.add(Arc::new(Quad::new(
+        point3!(123, 554, 147),
+        vec3!(300, 0, 0),
+        vec3!(0, 0, 265),
+        light,
+    )));
 
-//     let center0 = point3!(400, 400, 200);
-//     let center1 = center0 + vec3!(30, 0, 0);
-//     let moving_sphere_material = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
-//         0.7, 0.3, 0.1
-//     )))));
-//     hittable_list.add(Arc::new(MovingSphere::new(
-//         center0,
-//         center1,
-//         0.0,
-//         1.0,
-//         50.0,
-//         moving_sphere_material,
-//     )));
+    // Moving Sphere
+    let center1 = point3!(400, 400, 200);
+    let center2 = center1 + vec3!(30, 0, 0);
+    let sphere_material = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.7, 0.3, 0.1
+    )))));
+    world.add(Arc::new(Sphere::new_with_moving_sphere(
+        center1,
+        center2,
+        50.0,
+        sphere_material,
+    )));
 
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(260, 150, 45),
-//         50.0,
-//         Arc::new(Dielectric::new(1.5)),
-//     )));
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(0, 150, 145),
-//         50.0,
-//         Arc::new(Metal::new(&color!(0.8, 0.8, 0.9), 10.0)),
-//     )));
+    world.add(Arc::new(Sphere::new(
+        point3!(260, 150, 45),
+        50.0,
+        Arc::new(Dielectric::new(1.5)),
+    )));
+    world.add(Arc::new(Sphere::new(
+        point3!(0, 150, 145),
+        50.0,
+        Arc::new(Metal::new(&color!(0.8, 0.8, 0.9), 1.0)),
+    )));
 
-//     let boundary1 = Arc::new(Sphere::new(
-//         point3!(360, 150, 145),
-//         70.0,
-//         Arc::new(Dielectric::new(1.5)),
-//     ));
-//     hittable_list.add(boundary1.clone());
-//     hittable_list.add(Arc::new(ConstantMedium::new(
-//         boundary1.clone(),
-//         0.2,
-//         Arc::new(SolidColor::new(color!(0.2, 0.4, 0.9))),
-//     )));
+    let boundary1 = Arc::new(Sphere::new(
+        point3!(360, 150, 145),
+        70.0,
+        Arc::new(Dielectric::new(1.5)),
+    ));
+    world.add(boundary1.clone());
+    world.add(Arc::new(ConstantMedium::new(
+        boundary1.clone(),
+        0.2,
+        Arc::new(SolidColor::new(color!(0.2, 0.4, 0.9))),
+    )));
 
-//     let boundary2 = Arc::new(Sphere::new(
-//         point3!(0, 0, 0),
-//         5000.0,
-//         Arc::new(Dielectric::new(1.5)),
-//     ));
-//     hittable_list.add(Arc::new(ConstantMedium::new(
-//         boundary2,
-//         0.0001,
-//         Arc::new(SolidColor::new(color!(1, 1, 1))),
-//     )));
+    let emat = Arc::new(Lambertian::new(Arc::new(ImageTexture::new(Path::new(
+        "./data/earthmap.jpg",
+    )))));
+    world.add(Arc::new(Sphere::new(point3!(400, 200, 400), 100.0, emat)));
 
-//     let emat = Arc::new(Lambertian::new(Arc::new(ImageTexture::new(Path::new(
-//         "./data/earthmap.jpg",
-//     )))));
-//     hittable_list.add(Arc::new(Sphere::new(point3!(400, 200, 400), 100.0, emat)));
+    let pertext = Arc::new(NoiseTexture::new(0.2));
+    world.add(Arc::new(Sphere::new(
+        point3!(220, 280, 300),
+        80.0,
+        Arc::new(Lambertian::new(pertext)),
+    )));
 
-//     let pertext = Arc::new(NoiseTexture::new(0.1));
-//     hittable_list.add(Arc::new(Sphere::new(
-//         point3!(220, 280, 300),
-//         80.0,
-//         Arc::new(Lambertian::new(pertext)),
-//     )));
+    let mut boxes2 = HittableList::new();
+    let white = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.73, 0.73, 0.73
+    )))));
 
-//     let mut boxes2 = HittableList::new();
-//     let white = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
-//         0.73, 0.73, 0.73
-//     )))));
+    for _ in 0..1000 {
+        boxes2.add(Arc::new(Sphere::new(
+            Vec3::random_range(0.0, 165.0),
+            10.0,
+            white.clone(),
+        )));
+    }
 
-//     for _ in 0..1000 {
-//         boxes2.add(Arc::new(Sphere::new(
-//             Vec3::random_range(0.0, 165.0),
-//             10.0,
-//             white.clone(),
-//         )));
-//     }
+    world.add(Arc::new(Translate::new(
+        Arc::new(RotateY::new(
+            Arc::new(BvhNode::new_with_list(&mut boxes2, 0.0, 1.0)),
+            15.0,
+        )),
+        vec3!(-100, 270, 395),
+    )));
 
-//     hittable_list.add(Arc::new(Translate::new(
-//         Arc::new(RotateY::new(
-//             Arc::new(BvhNode::new_with_list(&mut boxes2, 0.0, 1.0)),
-//             15.0,
-//         )),
-//         vec3!(-100, 270, 395),
-//     )));
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
-//     // ライトの設定
-//     let lights = HittableList::new();
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    // カメラの設定
+    let aspect_ratio = 1.0;
+    let image_width = 500;
+    let image_height = (image_width as f64 / aspect_ratio) as usize;
+    let background = color!(0, 0, 0);
 
-//     // カメラの設定
-//     let aspect_ratio = 1.0;
-//     let image_width = 500;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0, 0, 0);
+    let lookfrom = point3!(278 * 2, 278, -800);
+    let lookat = point3!(278, 278, 0);
+    let vup = vec3!(0, 1, 0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 40.0;
 
-//     let lookfrom = point3!(278 * 2, 278, -800);
-//     let lookat = point3!(278, 278, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.0;
-//     let vfov = 40.0;
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
 
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
-
-//     (
-//         hittable_list,
-//         lights,
-//         direct_light_sampling,
-//         cam,
-//         background,
-//         image_width,
-//         image_height,
-//     )
-// }
+    (
+        world,
+        lights,
+        direct_light_sampling,
+        cam,
+        background,
+        image_width,
+        image_height,
+    )
+}
