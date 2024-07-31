@@ -15,6 +15,18 @@ pub struct CosinePdf {
     uvw: Onb,
 }
 
+pub struct SpherePdf;
+
+impl Pdf for SpherePdf {
+    fn value(&self, _direction: &Vec3) -> f64 {
+        1.0 / (4.0 * PI)
+    }
+
+    fn generate(&self) -> Vec3 {
+        random_unit_vector()
+    }
+}
+
 impl CosinePdf {
     pub fn new(w: &Vec3) -> Self {
         Self {
@@ -80,17 +92,5 @@ impl Pdf for MixturePdf {
         } else {
             self.p[1].generate()
         }
-    }
-}
-
-pub struct SpherePdf;
-
-impl Pdf for SpherePdf {
-    fn value(&self, _direction: &Vec3) -> f64 {
-        1.0 / (4.0 * PI)
-    }
-
-    fn generate(&self) -> Vec3 {
-        random_unit_vector()
     }
 }
