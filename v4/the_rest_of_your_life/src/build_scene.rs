@@ -14,73 +14,57 @@ use crate::{
 use std::path::Path;
 use std::sync::Arc;
 
-// pub fn minimul_scene() -> (
-//     HittableList,
-//     HittableList,
-//     bool,
-//     Camera,
-//     Color,
-//     usize,
-//     usize,
-// ) {
-//     let mut world = HittableList::new();
+pub fn minimul_scene() -> (HittableList, HittableList, Camera, bool) {
+    let mut world = HittableList::new();
 
-//     let checker = Arc::new(CheckerTexture::new(
-//         0.32,
-//         Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
-//         Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
-//     ));
-//     let ground_material = Arc::new(Lambertian::new(checker));
-//     world.add(Arc::new(Sphere::new(
-//         point3!(0, -1000, 0),
-//         1000.0,
-//         ground_material,
-//     )));
+    let checker = Arc::new(CheckerTexture::new(
+        0.32,
+        Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
+        Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
+    ));
+    let ground_material = Arc::new(Lambertian::new(checker));
+    world.add(Arc::new(Sphere::new(
+        point3!(0, -1000, 0),
+        1000.0,
+        ground_material,
+    )));
 
-//     let material = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
-//         0.4, 0.2, 0.1
-//     )))));
-//     world.add(Arc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material)));
+    let material = Arc::new(Lambertian::new(Arc::new(SolidColor::new(color!(
+        0.4, 0.2, 0.1
+    )))));
+    world.add(Arc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material)));
 
-//     // ライトの設定
-//     let lights = HittableList::new();
-//     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    // ライトの設定
+    let lights = HittableList::new();
+    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
-//     // カメラの設定
-//     let aspect_ratio = 16.0 / 9.0;
-//     let image_width = 400;
-//     let image_height = (image_width as f64 / aspect_ratio) as usize;
-//     let background = color!(0.7, 0.8, 1);
+    // カメラの設定
+    let lookfrom = point3!(13, 2, 3);
+    let lookat = point3!(0, 0, 0);
+    let image_width = 400;
+    let aspect_ratio = 16.0 / 9.0;
+    let samples_per_pixel = 100;
+    let max_depth = 20;
+    let background = color!(0.7, 0.8, 1);
+    let vfov = 20.0;
+    let defocus_angle = 0.6;
+    let focus_dist = 10.0;
 
-//     let lookfrom = point3!(13, 2, 3);
-//     let lookat = point3!(0, 0, 0);
-//     let vup = vec3!(0, 1, 0);
-//     let dist_to_focus = 10.0;
-//     let aperture = 0.1;
-//     let vfov = 20.0;
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        image_width,
+        aspect_ratio,
+        samples_per_pixel,
+        max_depth,
+        background,
+        vfov,
+        defocus_angle,
+        focus_dist,
+    );
 
-//     let cam = Camera::new(
-//         lookfrom,
-//         lookat,
-//         vup,
-//         vfov,
-//         aspect_ratio,
-//         aperture,
-//         dist_to_focus,
-//         0.0,
-//         1.0,
-//     );
-
-//     (
-//         world,
-//         lights,
-//         direct_light_sampling,
-//         cam,
-//         background,
-//         image_width,
-//         image_height,
-//     )
-// }
+    (world, lights, cam, direct_light_sampling)
+}
 
 // pub fn random_scene() -> (
 //     HittableList,
