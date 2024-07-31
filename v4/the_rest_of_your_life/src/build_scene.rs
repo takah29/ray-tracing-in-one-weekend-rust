@@ -26,6 +26,7 @@ pub fn minimul_scene() -> (
     let mut world = HittableList::new();
 
     let checker = Arc::new(CheckerTexture::new(
+        0.32,
         Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
         Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
     ));
@@ -93,6 +94,7 @@ pub fn random_scene() -> (
     let mut world = HittableList::new();
 
     let checker = Arc::new(CheckerTexture::new(
+        0.32,
         Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
         Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
     ));
@@ -197,6 +199,7 @@ pub fn two_spheres() -> (
     let mut hittable_list = HittableList::new();
 
     let checker = Arc::new(CheckerTexture::new(
+        0.32,
         Arc::new(SolidColor::new(color!(0.2, 0.3, 0.1))),
         Arc::new(SolidColor::new(color!(0.9, 0.9, 0.9))),
     ));

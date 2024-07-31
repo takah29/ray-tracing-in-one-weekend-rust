@@ -27,42 +27,34 @@ impl Texture for SolidColor {
 }
 
 pub struct CheckerTexture {
+    inv_scale: f64,
     even: Arc<dyn Texture>,
     odd: Arc<dyn Texture>,
 }
 
 impl CheckerTexture {
-    pub fn new(even: Arc<dyn Texture>, odd: Arc<dyn Texture>) -> Self {
-        Self { even, odd }
+    pub fn new(scale: f64, even: Arc<dyn Texture>, odd: Arc<dyn Texture>) -> Self {
+        Self {
+            inv_scale: 1.0 / scale,
+            even,
+            odd,
+        }
     }
 }
 
 impl Texture for CheckerTexture {
     fn value(&self, u: f64, v: f64, p: &Point3) -> Color {
-        let sines = (10.0 * p.e[0]).sin() * (10.0 * p.e[1]).sin() * (10.0 * p.e[2]).sin();
-        if sines < 0.0 {
-            return self.odd.value(u, v, p);
+        let x_integer = (self.inv_scale * p.e[0]).floor() as i32;
+        let y_integer = (self.inv_scale * p.e[1]).floor() as i32;
+        let z_integer = (self.inv_scale * p.e[2]).floor() as i32;
+
+        let is_even = (x_integer + y_integer + z_integer) % 2 == 0;
+
+        if is_even {
+            self.even.value(u, v, p)
         } else {
-            return self.even.value(u, v, p);
+            self.odd.value(u, v, p)
         }
-    }
-}
-
-pub struct NoiseTexture {
-    noise: Perlin,
-    scale: f64,
-}
-
-impl NoiseTexture {
-    pub fn new(scale: f64) -> Self {
-        let noise = Perlin::new();
-        Self { noise, scale }
-    }
-}
-
-impl Texture for NoiseTexture {
-    fn value(&self, _: f64, _: f64, p: &Point3) -> Color {
-        color!(1, 1, 1) * 0.5 * (1.0 + (self.scale * p.e[2] + 10.0 * self.noise.turb(p, 7)).sin())
     }
 }
 
@@ -98,5 +90,23 @@ impl Texture for ImageTexture {
         let pixel = *self.data.get_pixel(i, j);
 
         color!(pixel[0], pixel[1], pixel[2])
+    }
+}
+
+pub struct NoiseTexture {
+    noise: Perlin,
+    scale: f64,
+}
+
+impl NoiseTexture {
+    pub fn new(scale: f64) -> Self {
+        let noise = Perlin::new();
+        Self { noise, scale }
+    }
+}
+
+impl Texture for NoiseTexture {
+    fn value(&self, _: f64, _: f64, p: &Point3) -> Color {
+        color!(0.5, 0.5, 0.5) * (1.0 + (self.scale * p.e[2] + 10.0 * self.noise.turb(p, 7)).sin())
     }
 }

@@ -4,7 +4,7 @@ use crate::{
 };
 
 pub struct Perlin {
-    ranvec: Vec<Vec3>,
+    randvec: Vec<Vec3>,
     perm_x: Vec<i32>,
     perm_y: Vec<i32>,
     perm_z: Vec<i32>,
@@ -14,7 +14,7 @@ impl Perlin {
     const POINT_COUNT: usize = 256;
 
     pub fn new() -> Self {
-        let ranvec = (0..Self::POINT_COUNT)
+        let randvec = (0..Self::POINT_COUNT)
             .map(|_| Vec3::random_range(-1.0, 1.0).unit())
             .collect();
         let perm_x = Self::perlin_generate_perm();
@@ -22,7 +22,7 @@ impl Perlin {
         let perm_z = Self::perlin_generate_perm();
 
         Self {
-            ranvec,
+            randvec,
             perm_x,
             perm_y,
             perm_z,
@@ -41,7 +41,7 @@ impl Perlin {
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    c[di][dj][dk] = self.ranvec[(self.perm_x[((i + di as i32) & 255) as usize]
+                    c[di][dj][dk] = self.randvec[(self.perm_x[((i + di as i32) & 255) as usize]
                         ^ self.perm_y[((j + dj as i32) & 255) as usize]
                         ^ self.perm_z[((k + dk as i32) & 255) as usize])
                         as usize];
