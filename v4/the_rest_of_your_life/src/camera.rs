@@ -127,6 +127,7 @@ impl Camera {
                 .unwrap()
                 .progress_chars("#>-"),
         );
+        pb.inc(0);
 
         let pixels = (0..self.image_height)
             .into_par_iter()

@@ -36,7 +36,7 @@ pub fn minimal_scene() -> (HittableList, HittableList, Camera, bool) {
 
     // ライトの設定
     let lights = HittableList::new();
-    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    let direct_light_sampling = lights.objects.len() != 0; // 指定した光源の直接サンプリングを有効にする
 
     // カメラの設定
     let lookfrom = point3!(13, 2, 3);
@@ -125,7 +125,7 @@ pub fn random_scene() -> (HittableList, HittableList, Camera, bool) {
 
     // ライトの設定
     let lights = HittableList::new();
-    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    let direct_light_sampling = lights.objects.len() != 0;
 
     // カメラの設定
     let lookfrom = point3!(13, 2, 3);
@@ -177,7 +177,7 @@ pub fn two_spheres() -> (HittableList, HittableList, Camera, bool) {
 
     // ライトの設定
     let lights = HittableList::new();
-    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    let direct_light_sampling = lights.objects.len() != 0;
 
     // カメラの設定
     let lookfrom = point3!(13, 2, 3);
@@ -225,7 +225,7 @@ pub fn two_perlin_spheres() -> (HittableList, HittableList, Camera, bool) {
 
     // ライトの設定
     let lights = HittableList::new();
-    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    let direct_light_sampling = lights.objects.len() != 0;
 
     // カメラの設定
     let lookfrom = point3!(13, 2, 3);
@@ -265,7 +265,7 @@ pub fn earth() -> (HittableList, HittableList, Camera, bool) {
 
     // ライトの設定
     let lights = HittableList::new();
-    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    let direct_light_sampling = lights.objects.len() != 0;
 
     // カメラの設定
     let lookfrom = point3!(0, 0, 12);
@@ -328,7 +328,7 @@ pub fn simple_light() -> (HittableList, HittableList, Camera, bool) {
 
     // ライトの設定
     let lights = HittableList::new();
-    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    let direct_light_sampling = lights.objects.len() != 0;
 
     // カメラの設定
     let lookfrom = point3!(26, 3, 6);
@@ -444,7 +444,7 @@ pub fn cornell_box() -> (HittableList, HittableList, Camera, bool) {
         90.0,
         empty_material.clone(),
     )));
-    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    let direct_light_sampling = lights.objects.len() != 0;
 
     // カメラの設定
     let lookfrom = point3!(278, 278, -800);
@@ -567,7 +567,7 @@ pub fn cornell_smoke() -> (HittableList, HittableList, Camera, bool) {
         vec3!(0, 0, 305),
         empty_material.clone(),
     )));
-    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    let direct_light_sampling = lights.objects.len() != 0;
 
     // カメラの設定
     let lookfrom = point3!(278, 278, -800);
@@ -714,7 +714,7 @@ pub fn final_scene() -> (HittableList, HittableList, Camera, bool) {
         vec3!(0, 0, 265),
         empty_material.clone(),
     )));
-    let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
+    let direct_light_sampling = lights.objects.len() != 0;
 
     // カメラの設定
     let lookfrom = point3!(478, 278, -600);
