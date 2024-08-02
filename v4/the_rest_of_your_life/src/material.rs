@@ -44,7 +44,7 @@ impl Material for Lambertian {
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
         srec.skip_pdf = false;
         srec.attenuation = self.albedo.value(rec.u, rec.v, &rec.p);
-        srec.opt_pdf_ptr = Some(Arc::new(CosinePdf::new(&rec.normal)));
+        srec.opt_pdf_ptr = Some(Arc::new(CosinePdf::new(rec.normal)));
         true
     }
 
@@ -64,9 +64,9 @@ pub struct Metal {
 }
 
 impl Metal {
-    pub fn new(albedo: &Color, fuzz: f64) -> Self {
+    pub fn new(albedo: Color, fuzz: f64) -> Self {
         Self {
-            albedo: *albedo,
+            albedo,
             fuzz: fuzz.clamp(0.0, 1.0),
         }
     }

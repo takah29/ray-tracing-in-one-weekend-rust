@@ -2,7 +2,7 @@ use crate::{
     aabb::Aabb,
     hittable::{HitRecord, Hittable},
     interval::Interval,
-    rtweekend::{random_int, Ray, Vec3},
+    rtweekend::{random_int, Point3, Ray, Vec3},
 };
 use std::sync::Arc;
 
@@ -56,7 +56,7 @@ impl Hittable for HittableList {
         self.bbox
     }
 
-    fn pdf_value(&self, origin: &crate::vec3::Point3, v: &crate::vec3::Vec3) -> f64 {
+    fn pdf_value(&self, origin: &Point3, v: &Vec3) -> f64 {
         let weight = 1.0 / self.objects.len() as f64;
         let sum = self
             .objects

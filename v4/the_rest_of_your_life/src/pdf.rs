@@ -28,9 +28,9 @@ impl Pdf for SpherePdf {
 }
 
 impl CosinePdf {
-    pub fn new(w: &Vec3) -> Self {
+    pub fn new(w: Vec3) -> Self {
         Self {
-            uvw: Onb::build_from_w(*w),
+            uvw: Onb::build_from_w(w),
         }
     }
 }

@@ -103,7 +103,7 @@ pub fn random_scene() -> (HittableList, HittableList, Camera, bool) {
                     // metal
                     let albedo = Color::random_range(0.5, 1.0);
                     let fuzz = random();
-                    let sphere_material = Arc::new(Metal::new(&albedo, fuzz));
+                    let sphere_material = Arc::new(Metal::new(albedo, fuzz));
                     world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
                     // grass
@@ -120,7 +120,7 @@ pub fn random_scene() -> (HittableList, HittableList, Camera, bool) {
         0.4, 0.2, 0.1
     )))));
     world.add(Arc::new(Sphere::new(point3!(-4, 1, 0), 1.0, material2)));
-    let material3 = Arc::new(Metal::new(&color!(0.7, 0.6, 0.5), 0.0));
+    let material3 = Arc::new(Metal::new(color!(0.7, 0.6, 0.5), 0.0));
     world.add(Arc::new(Sphere::new(point3!(4, 1, 0), 1.0, material3)));
 
     // ライトの設定
@@ -657,7 +657,7 @@ pub fn final_scene() -> (HittableList, HittableList, Camera, bool) {
     world.add(Arc::new(Sphere::new(
         point3!(0, 150, 145),
         50.0,
-        Arc::new(Metal::new(&color!(0.8, 0.8, 0.9), 1.0)),
+        Arc::new(Metal::new(color!(0.8, 0.8, 0.9), 1.0)),
     )));
 
     let boundary1 = Arc::new(Sphere::new(
