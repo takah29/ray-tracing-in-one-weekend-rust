@@ -434,9 +434,9 @@ pub fn cornell_box() -> (HittableList, HittableList, Camera, bool) {
     let empty_material = Arc::new(EmptyMaterial);
     let mut lights = HittableList::new();
     lights.add(Arc::new(Quad::new(
-        point3!(343, 554, 332),
-        vec3!(-130, 0, 0),
-        vec3!(0, 0, -105),
+        point3!(213, 554, 227),
+        vec3!(130, 0, 0),
+        vec3!(0, 0, 105),
         empty_material.clone(),
     )));
     lights.add(Arc::new(Sphere::new(
@@ -559,7 +559,14 @@ pub fn cornell_smoke() -> (HittableList, HittableList, Camera, bool) {
     )));
 
     // ライトの設定
-    let lights = HittableList::new();
+    let empty_material = Arc::new(EmptyMaterial);
+    let mut lights = HittableList::new();
+    lights.add(Arc::new(Quad::new(
+        point3!(113, 554, 127),
+        vec3!(330, 0, 0),
+        vec3!(0, 0, 305),
+        empty_material.clone(),
+    )));
     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
     // カメラの設定
@@ -699,7 +706,14 @@ pub fn final_scene() -> (HittableList, HittableList, Camera, bool) {
     )));
 
     // ライトの設定
-    let lights = HittableList::new();
+    let empty_material = Arc::new(EmptyMaterial);
+    let mut lights = HittableList::new();
+    lights.add(Arc::new(Quad::new(
+        point3!(123, 554, 147),
+        vec3!(300, 0, 0),
+        vec3!(0, 0, 265),
+        empty_material.clone(),
+    )));
     let direct_light_sampling = lights.objects.len() != 0; // 光源があれば光源の直接サンプリングを有効にする
 
     // カメラの設定
