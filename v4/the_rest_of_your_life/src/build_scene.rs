@@ -672,6 +672,17 @@ pub fn final_scene() -> (HittableList, HittableList, Camera, bool) {
         Arc::new(SolidColor::new(color!(0.2, 0.4, 0.9))),
     )));
 
+    let boundary2 = Arc::new(Sphere::new(
+        point3!(0, 0, 0),
+        5000.0,
+        Arc::new(Dielectric::new(1.5)),
+    ));
+    world.add(Arc::new(ConstantMedium::new_with_color(
+        boundary2,
+        0.0001,
+        color!(1, 1, 1),
+    )));
+
     let emat = Arc::new(Lambertian::new(Arc::new(ImageTexture::new(Path::new(
         "./data/earthmap.jpg",
     )))));
