@@ -8,10 +8,10 @@ use crate::{
 };
 use std::sync::Arc;
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct ScatterRecord {
     pub attenuation: Color,
-    pub opt_pdf_ptr: Option<Arc<dyn Pdf>>,
+    pub opt_pdf_ptr: Option<Box<dyn Pdf>>,
     pub skip_pdf: bool,
     pub skip_pdf_ray: Ray,
 }
@@ -44,7 +44,7 @@ impl Material for Lambertian {
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
         srec.skip_pdf = false;
         srec.attenuation = self.albedo.value(rec.u, rec.v, &rec.p);
-        srec.opt_pdf_ptr = Some(Arc::new(CosinePdf::new(rec.normal)));
+        srec.opt_pdf_ptr = Some(Box::new(CosinePdf::new(rec.normal)));
         true
     }
 
@@ -171,7 +171,7 @@ impl Isotropic {
 
 impl Material for Isotropic {
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
-        srec.opt_pdf_ptr = Some(Arc::new(SpherePdf));
+        srec.opt_pdf_ptr = Some(Box::new(SpherePdf));
         srec.attenuation = self.tex.value(rec.u, rec.v, &rec.p);
 
         true

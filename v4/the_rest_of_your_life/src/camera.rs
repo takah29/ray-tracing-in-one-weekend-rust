@@ -11,7 +11,6 @@ use crate::{
 };
 use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
-use std::sync::Arc;
 
 pub struct Camera {
     pub lookfrom: Point3,
@@ -236,12 +235,12 @@ impl Camera {
                 );
         }
 
-        let p: Arc<dyn Pdf> = if direct_light_sampling {
+        let p: Box<dyn Pdf> = if direct_light_sampling {
             let lights_ptr: *const dyn Hittable =
                 unsafe { std::mem::transmute(lights as *const dyn Hittable) };
 
-            let light_ptr = Arc::new(HittablePdf::new(lights_ptr, rec.p));
-            Arc::new(MixturePdf::new(
+            let light_ptr = Box::new(HittablePdf::new(lights_ptr, rec.p));
+            Box::new(MixturePdf::new(
                 light_ptr,
                 srec.opt_pdf_ptr.expect("PDF not set"),
             ))

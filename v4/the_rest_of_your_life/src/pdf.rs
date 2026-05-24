@@ -4,7 +4,6 @@ use crate::{
     rtweekend::{random, Point3, Vec3, PI},
     vec3::{random_cosine_direction, random_unit_vector},
 };
-use std::sync::Arc;
 
 pub trait Pdf: Sync + Send {
     fn value(&self, direction: &Vec3) -> f64;
@@ -75,11 +74,11 @@ impl Pdf for HittablePdf {
 }
 
 pub struct MixturePdf {
-    p: [Arc<dyn Pdf>; 2],
+    p: [Box<dyn Pdf>; 2],
 }
 
 impl MixturePdf {
-    pub fn new(p0: Arc<dyn Pdf>, p1: Arc<dyn Pdf>) -> Self {
+    pub fn new(p0: Box<dyn Pdf>, p1: Box<dyn Pdf>) -> Self {
         Self { p: [p0, p1] }
     }
 }
