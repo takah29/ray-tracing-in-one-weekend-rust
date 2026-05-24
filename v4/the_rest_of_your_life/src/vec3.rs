@@ -94,6 +94,7 @@ pub fn random_to_sphere(radius: f64, distance_squared: f64) -> Vec3 {
     vec3!(x, y, z)
 }
 
+#[inline]
 pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
     *v - 2.0 * v.dot(*n) * (*n)
 }
@@ -106,20 +107,24 @@ pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
 }
 
 impl Vec3 {
+    #[inline]
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { e: [x, y, z] }
     }
 
+    #[inline]
     pub fn origin() -> Self {
         Self { e: [0.0, 0.0, 0.0] }
     }
 
+    #[inline]
     pub fn random() -> Self {
         Self {
             e: [random(), random(), random()],
         }
     }
 
+    #[inline]
     pub fn random_range(min: f64, max: f64) -> Self {
         Self {
             e: [
@@ -130,18 +135,22 @@ impl Vec3 {
         }
     }
 
+    #[inline]
     pub fn length_squared(self) -> f64 {
         self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
     }
 
+    #[inline]
     pub fn length(self) -> f64 {
         self.length_squared().sqrt()
     }
 
+    #[inline]
     pub fn dot(self, other: Self) -> f64 {
         self.e[0] * other.e[0] + self.e[1] * other.e[1] + self.e[2] * other.e[2]
     }
 
+    #[inline]
     pub fn cross(self, other: Self) -> Self {
         Self {
             e: [
@@ -152,6 +161,7 @@ impl Vec3 {
         }
     }
 
+    #[inline]
     pub fn unit(self) -> Self {
         self / self.length()
     }
@@ -162,6 +172,7 @@ impl Vec3 {
 impl Neg for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn neg(self) -> Self::Output {
         Self {
             e: [-self.e[0], -self.e[1], -self.e[2]],
@@ -174,6 +185,7 @@ impl Neg for Vec3 {
 impl Add<Vec3> for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn add(self, rhs: Self) -> Self::Output {
         Self {
             e: [
@@ -188,6 +200,7 @@ impl Add<Vec3> for Vec3 {
 impl Add<f64> for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn add(self, rhs: f64) -> Self::Output {
         Self {
             e: [self.e[0] + rhs, self.e[1] + rhs, self.e[2] + rhs],
@@ -198,6 +211,7 @@ impl Add<f64> for Vec3 {
 impl Add<Vec3> for f64 {
     type Output = Vec3;
 
+    #[inline]
     fn add(self, rhs: Vec3) -> Self::Output {
         Vec3 {
             e: [self + rhs.e[0], self + rhs.e[1], self + rhs.e[2]],
@@ -210,6 +224,7 @@ impl Add<Vec3> for f64 {
 impl Sub<Vec3> for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         Self {
             e: [
@@ -224,6 +239,7 @@ impl Sub<Vec3> for Vec3 {
 impl Sub<f64> for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn sub(self, rhs: f64) -> Self::Output {
         Self {
             e: [self.e[0] - rhs, self.e[1] - rhs, self.e[2] - rhs],
@@ -234,6 +250,7 @@ impl Sub<f64> for Vec3 {
 impl Sub<Vec3> for f64 {
     type Output = Vec3;
 
+    #[inline]
     fn sub(self, rhs: Vec3) -> Self::Output {
         Vec3 {
             e: [self - rhs.e[0], self - rhs.e[1], self - rhs.e[2]],
@@ -246,6 +263,7 @@ impl Sub<Vec3> for f64 {
 impl Mul<f64> for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn mul(self, rhs: f64) -> Self::Output {
         Self {
             e: [self.e[0] * rhs, self.e[1] * rhs, self.e[2] * rhs],
@@ -256,6 +274,7 @@ impl Mul<f64> for Vec3 {
 impl Mul<Vec3> for f64 {
     type Output = Vec3;
 
+    #[inline]
     fn mul(self, rhs: Vec3) -> Self::Output {
         Vec3 {
             e: [self * rhs.e[0], self * rhs.e[1], self * rhs.e[2]],
@@ -266,6 +285,7 @@ impl Mul<Vec3> for f64 {
 impl Mul<Vec3> for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
         Self {
             e: [
@@ -282,6 +302,7 @@ impl Mul<Vec3> for Vec3 {
 impl Div<f64> for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn div(self, rhs: f64) -> Self::Output {
         Self {
             e: [self.e[0] / rhs, self.e[1] / rhs, self.e[2] / rhs],
@@ -292,6 +313,7 @@ impl Div<f64> for Vec3 {
 // ========== AddAssign ==========
 
 impl AddAssign<Vec3> for Vec3 {
+    #[inline]
     fn add_assign(&mut self, rhs: Self) {
         self.e[0] += rhs.e[0];
         self.e[1] += rhs.e[1];
@@ -300,6 +322,7 @@ impl AddAssign<Vec3> for Vec3 {
 }
 
 impl AddAssign<f64> for Vec3 {
+    #[inline]
     fn add_assign(&mut self, rhs: f64) {
         self.e[0] += rhs;
         self.e[1] += rhs;
@@ -310,6 +333,7 @@ impl AddAssign<f64> for Vec3 {
 // ========== SubAssign ==========
 
 impl SubAssign<Vec3> for Vec3 {
+    #[inline]
     fn sub_assign(&mut self, rhs: Self) {
         self.e[0] -= rhs.e[0];
         self.e[1] -= rhs.e[1];
@@ -318,6 +342,7 @@ impl SubAssign<Vec3> for Vec3 {
 }
 
 impl SubAssign<f64> for Vec3 {
+    #[inline]
     fn sub_assign(&mut self, rhs: f64) {
         self.e[0] -= rhs;
         self.e[1] -= rhs;
@@ -328,6 +353,7 @@ impl SubAssign<f64> for Vec3 {
 // ========== MulAssign ==========
 
 impl MulAssign<f64> for Vec3 {
+    #[inline]
     fn mul_assign(&mut self, rhs: f64) {
         self.e[0] *= rhs;
         self.e[1] *= rhs;
@@ -338,6 +364,7 @@ impl MulAssign<f64> for Vec3 {
 // ========== DivAssign ==========
 
 impl DivAssign<f64> for Vec3 {
+    #[inline]
     fn div_assign(&mut self, rhs: f64) {
         *self *= 1.0 / rhs;
     }
