@@ -64,9 +64,13 @@ pub struct ImageTexture {
 
 impl ImageTexture {
     pub fn new(filename: &Path) -> Self {
-        let data = image::open(filename)
+        let mut data = image::open(filename)
             .expect("Failed to load image")
             .into_rgb32f();
+
+        data.pixels_mut().for_each(|pixel| {
+            pixel.0 = pixel.0.map(|c| c.powf(2.2));
+        });
 
         Self { data }
     }

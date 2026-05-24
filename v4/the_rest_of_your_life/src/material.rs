@@ -4,7 +4,7 @@ use crate::{
     pdf::{CosinePdf, Pdf, SpherePdf},
     rtweekend::{random, Color, Point3, Ray, PI},
     texture::{SolidColor, Texture},
-    vec3::{random_in_unit_sphere, reflect, refract},
+    vec3::{random_unit_vector, reflect, refract},
 };
 use std::sync::Arc;
 
@@ -77,7 +77,7 @@ impl Material for Metal {
         let reflected = reflect(&r_in.dir.unit(), &rec.normal);
         srec.skip_pdf_ray = Ray::new_with_time(
             rec.p,
-            reflected + self.fuzz * random_in_unit_sphere(),
+            reflected + self.fuzz * random_unit_vector(),
             r_in.time,
         );
         srec.attenuation = self.albedo;
