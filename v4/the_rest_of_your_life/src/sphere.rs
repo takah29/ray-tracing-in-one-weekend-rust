@@ -100,7 +100,7 @@ impl Hittable for Sphere {
         let outward_normal = (rec.p - center) / self.radius;
         rec.set_face_normal(r, &outward_normal);
         Sphere::get_sphere_uv(&outward_normal, &mut rec.u, &mut rec.v);
-        rec.opt_mat_ptr = Some(self.mat_ptr.clone());
+        rec.mat = Some(std::sync::Arc::as_ptr(&self.mat_ptr));
 
         true
     }

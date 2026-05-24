@@ -85,7 +85,7 @@ impl Hittable for Quad {
 
         rec.t = t;
         rec.p = intersection;
-        rec.opt_mat_ptr = Some(self.mat_ptr.clone());
+        rec.mat = Some(std::sync::Arc::as_ptr(&self.mat_ptr));
         rec.set_face_normal(r, &self.normal);
 
         return true;

@@ -8,7 +8,7 @@ use crate::{
 };
 use std::sync::Arc;
 
-#[derive(Default, Clone)]
+#[derive(Clone, Copy)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
@@ -16,7 +16,21 @@ pub struct HitRecord {
     pub u: f64,
     pub v: f64,
     pub front_face: bool,
-    pub opt_mat_ptr: Option<Arc<dyn Material>>,
+    pub mat: Option<*const dyn Material>,
+}
+
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self {
+            p: Point3::default(),
+            normal: Vec3::default(),
+            t: 0.0,
+            u: 0.0,
+            v: 0.0,
+            front_face: false,
+            mat: None,
+        }
+    }
 }
 
 impl HitRecord {

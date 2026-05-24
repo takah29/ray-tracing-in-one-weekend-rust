@@ -75,9 +75,9 @@ impl Hittable for ConstantMedium {
         rec.t = rec1.t + hit_distance / ray_length;
         rec.p = r.at(rec.t);
 
-        rec.normal = vec3!(1, 0, 0); // どんな値でもよい
-        rec.front_face = true; // 同じくどんな値でもよい
-        rec.opt_mat_ptr = Some(self.phase_function.clone());
+        rec.normal = vec3!(1, 0, 0);
+        rec.front_face = true;
+        rec.mat = Some(std::sync::Arc::as_ptr(&self.phase_function));
 
         true
     }

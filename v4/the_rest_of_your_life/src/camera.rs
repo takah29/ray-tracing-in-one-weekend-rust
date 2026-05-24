@@ -217,19 +217,16 @@ impl Camera {
             return self.background;
         }
 
-        let mut srec = ScatterRecord::default();
-        let color_from_emission = rec
-            .opt_mat_ptr
-            .as_ref()
-            .expect("Material not set")
-            .emitted(&rec, rec.u, rec.v, &rec.p);
+        let mat_ptr = match rec.mat {
+            Some(p) => p,
+            None => panic!("Material not set on hit object"),
+        };
+        let mat = unsafe { &*mat_ptr };
 
-        if !rec
-            .opt_mat_ptr
-            .as_ref()
-            .expect("Material not set")
-            .scatter(&r, &rec, &mut srec)
-        {
+        let mut srec = ScatterRecord::default();
+        let color_from_emission = mat.emitted(&rec, rec.u, rec.v, &rec.p);
+
+        if !mat.scatter(&r, &rec, &mut srec) {
             return color_from_emission;
         }
 
@@ -257,11 +254,7 @@ impl Camera {
         let scattered = Ray::new_with_time(rec.p, p.generate(), r.time);
         let pdf_value = p.value(&scattered.dir);
 
-        let scattering_pdf = rec
-            .opt_mat_ptr
-            .as_ref()
-            .expect("Material not set")
-            .scattering_pdf(&r, &rec, &scattered);
+        let scattering_pdf = mat.scattering_pdf(&r, &rec, &scattered);
 
         let sample_color =
             self.ray_color(scattered, world, lights, direct_light_sampling, depth - 1);
