@@ -58,7 +58,7 @@ impl Aabb {
         Aabb::new(x, y, z)
     }
 
-    pub fn hit(&self, r: &Ray, ray_t: Interval) -> bool {
+    pub fn hit(&self, r: &Ray, mut ray_t: Interval) -> bool {
         for axis_num in 0..3 {
             let ax = self.axis_interval(axis_num);
             let adinv = 1.0 / r.dir.e[axis_num];
@@ -66,7 +66,6 @@ impl Aabb {
             let t0 = (ax.min - r.orig.e[axis_num]) * adinv;
             let t1 = (ax.max - r.orig.e[axis_num]) * adinv;
 
-            let mut ray_t = ray_t;
             if t0 < t1 {
                 if t0 > ray_t.min {
                     ray_t.min = t0;
