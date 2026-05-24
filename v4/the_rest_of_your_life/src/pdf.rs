@@ -50,24 +50,27 @@ impl Pdf for CosinePdf {
     }
 }
 
+unsafe impl Send for HittablePdf {}
+unsafe impl Sync for HittablePdf {}
+
 pub struct HittablePdf {
-    obj_ptr: Arc<dyn Hittable>,
+    obj_ptr: *const dyn Hittable,
     origin: Point3,
 }
 
 impl HittablePdf {
-    pub fn new(obj_ptr: Arc<dyn Hittable>, origin: Point3) -> Self {
+    pub fn new(obj_ptr: *const dyn Hittable, origin: Point3) -> Self {
         Self { obj_ptr, origin }
     }
 }
 
 impl Pdf for HittablePdf {
     fn value(&self, direction: &Vec3) -> f64 {
-        self.obj_ptr.pdf_value(&self.origin, direction)
+        unsafe { &*self.obj_ptr }.pdf_value(&self.origin, direction)
     }
 
     fn generate(&self) -> Vec3 {
-        self.obj_ptr.random(&self.origin)
+        unsafe { &*self.obj_ptr }.random(&self.origin)
     }
 }
 

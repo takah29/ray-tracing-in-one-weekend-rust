@@ -112,12 +112,7 @@ impl Camera {
         }
     }
 
-    pub fn render(
-        &self,
-        world: &Box<dyn Hittable>,
-        lights: &Arc<dyn Hittable>,
-        direct_light_sampling: bool,
-    ) {
+    pub fn render(&self, world: &dyn Hittable, lights: &dyn Hittable, direct_light_sampling: bool) {
         let pb = ProgressBar::new(self.image_height as u64);
         pb.set_style(
             ProgressStyle::default_bar()
@@ -141,8 +136,8 @@ impl Camera {
 
                             pixel_color += self.ray_color(
                                 r,
-                                &world,
-                                &lights,
+                                world,
+                                lights,
                                 direct_light_sampling,
                                 self.max_depth,
                             );
@@ -203,8 +198,8 @@ impl Camera {
     fn ray_color(
         &self,
         r: Ray,
-        world: &Box<dyn Hittable>,
-        lights: &Arc<dyn Hittable>,
+        world: &dyn Hittable,
+        lights: &dyn Hittable,
         direct_light_sampling: bool,
         depth: u32,
     ) -> Color {
@@ -242,7 +237,10 @@ impl Camera {
         }
 
         let p: Arc<dyn Pdf> = if direct_light_sampling {
-            let light_ptr = Arc::new(HittablePdf::new(lights.clone(), rec.p));
+            let lights_ptr: *const dyn Hittable =
+                unsafe { std::mem::transmute(lights as *const dyn Hittable) };
+
+            let light_ptr = Arc::new(HittablePdf::new(lights_ptr, rec.p));
             Arc::new(MixturePdf::new(
                 light_ptr,
                 srec.opt_pdf_ptr.expect("PDF not set"),

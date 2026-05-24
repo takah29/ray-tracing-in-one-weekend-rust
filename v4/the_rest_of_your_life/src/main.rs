@@ -8,11 +8,11 @@ use the_rest_of_your_life::build_scene::{
 };
 
 fn main() {
-    let (mut hittable_list, lights, cam, direct_light_sampling) = cornell_box();
+    let (mut hittable_list, lights, cam, direct_light_sampling) = final_scene();
 
     // let world: Box<dyn Hittable> = Box::new(hittable_list);
     let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
     let lights: Arc<dyn Hittable> = Arc::new(lights);
 
-    cam.render(&world, &lights, direct_light_sampling);
+    cam.render(world.as_ref(), lights.as_ref(), direct_light_sampling);
 }
