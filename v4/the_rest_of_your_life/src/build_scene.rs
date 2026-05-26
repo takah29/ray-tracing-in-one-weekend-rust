@@ -133,7 +133,7 @@ pub fn random_scene() -> (HittableList, HittableList, Camera, bool) {
     let image_width = 400;
     let aspect_ratio = 16.0 / 9.0;
     let samples_per_pixel = 100;
-    let max_depth = 20;
+    let max_depth = 50;
     let background = color!(0.7, 0.8, 1);
     let vfov = 20.0;
     let defocus_angle = 0.6;
@@ -452,7 +452,7 @@ pub fn cornell_box() -> (HittableList, HittableList, Camera, bool) {
     let image_width = 600;
     let aspect_ratio = 1.0;
     let samples_per_pixel = 100;
-    let max_depth = 20;
+    let max_depth = 50;
     let background = color!(0, 0, 0);
     let vfov = 40.0;
     let defocus_angle = 0.0;
@@ -730,10 +730,10 @@ pub fn final_scene() -> (HittableList, HittableList, Camera, bool) {
     // カメラの設定
     let lookfrom = point3!(478, 278, -600);
     let lookat = point3!(278, 278, 0);
-    let image_width = 600;
+    let image_width = 400;
     let aspect_ratio = 1.0;
     let samples_per_pixel = 100;
-    let max_depth = 20;
+    let max_depth = 40;
     let background = color!(0, 0, 0);
     let vfov = 40.0;
     let defocus_angle = 0.0;

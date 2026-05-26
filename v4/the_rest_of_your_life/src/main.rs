@@ -8,7 +8,7 @@ use the_rest_of_your_life::build_scene::{
 };
 
 fn main() {
-    let (mut hittable_list, lights, cam, direct_light_sampling) = final_scene();
+    let (mut hittable_list, lights, cam, direct_light_sampling) = cornell_box();
 
     // let world: Box<dyn Hittable> = Box::new(hittable_list);
     let world: Box<dyn Hittable> = Box::new(BvhNode::new_with_list(&mut hittable_list, 0.0, 1.0));
