@@ -575,7 +575,7 @@ pub fn cornell_smoke() -> (HittableList, HittableList, Camera, bool) {
     let image_width = 600;
     let aspect_ratio = 1.0;
     let samples_per_pixel = 100;
-    let max_depth = 20;
+    let max_depth = 50;
     let background = color!(0, 0, 0);
     let vfov = 40.0;
     let defocus_angle = 0.0;
@@ -733,7 +733,7 @@ pub fn final_scene() -> (HittableList, HittableList, Camera, bool) {
     let image_width = 400;
     let aspect_ratio = 1.0;
     let samples_per_pixel = 100;
-    let max_depth = 40;
+    let max_depth = 50;
     let background = color!(0, 0, 0);
     let vfov = 40.0;
     let defocus_angle = 0.0;
