@@ -2,25 +2,25 @@ pub use crate::{
     ray::Ray,
     vec3::{Color, Point3, Vec3},
 };
-use rand::Rng;
+use rand::RngExt;
 use std::cell::RefCell;
 pub use std::f64::INFINITY;
 pub use std::f64::consts::PI;
 
 thread_local! {
-    static RNG: RefCell<rand::rngs::ThreadRng> = RefCell::new(rand::thread_rng());
+    static RNG: RefCell<rand::rngs::ThreadRng> = RefCell::new(rand::rng());
 }
 
 pub fn random() -> f64 {
-    RNG.with(|rng| rng.borrow_mut().r#gen())
+    RNG.with(|rng| rng.borrow_mut().random())
 }
 
 pub fn random_range(min: f64, max: f64) -> f64 {
-    RNG.with(|rng| rng.borrow_mut().gen_range(min..max))
+    RNG.with(|rng| rng.borrow_mut().random_range(min..max))
 }
 
 pub fn random_int(min: i32, max: i32) -> i32 {
-    RNG.with(|rng| rng.borrow_mut().gen_range(min..=max))
+    RNG.with(|rng| rng.borrow_mut().random_range(min..=max))
 }
 
 #[cfg(test)]
