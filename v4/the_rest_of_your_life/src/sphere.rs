@@ -4,7 +4,7 @@ use crate::{
     interval::Interval,
     material::Material,
     onb::Onb,
-    rtweekend::{Point3, Ray, Vec3, PI},
+    rtweekend::{PI, Point3, Ray, Vec3},
     vec3,
     vec3::random_to_sphere,
 };

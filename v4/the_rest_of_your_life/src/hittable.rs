@@ -3,7 +3,7 @@ use crate::{
     interval::Interval,
     material::Material,
     point3,
-    rtweekend::{Point3, Ray, Vec3, INFINITY},
+    rtweekend::{INFINITY, Point3, Ray, Vec3},
     vec3,
 };
 use std::sync::Arc;

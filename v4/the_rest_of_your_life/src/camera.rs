@@ -4,7 +4,7 @@ use crate::{
     interval::Interval,
     material::ScatterRecord,
     pdf::{HittablePdf, MixturePdf, Pdf},
-    rtweekend::{random, Color, Point3, Ray, Vec3, INFINITY},
+    rtweekend::{Color, INFINITY, Point3, Ray, Vec3, random},
     utils::write_ppm,
     vec3::random_in_unit_disk,
     {color, vec3},

@@ -4,7 +4,7 @@ use crate::{
     hittable_list::HittableList,
     interval::Interval,
     material::Material,
-    rtweekend::{random, Point3, Ray, Vec3, INFINITY},
+    rtweekend::{INFINITY, Point3, Ray, Vec3, random},
     {point3, vec3},
 };
 use std::sync::Arc;

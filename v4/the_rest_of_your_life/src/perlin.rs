@@ -1,5 +1,5 @@
 use crate::{
-    rtweekend::{random_int, Point3, Vec3},
+    rtweekend::{Point3, Vec3, random_int},
     vec3,
 };
 

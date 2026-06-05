@@ -2,7 +2,7 @@ use crate::{
     color,
     hittable::HitRecord,
     pdf::{CosinePdf, Pdf, SpherePdf},
-    rtweekend::{random, Color, Point3, Ray, PI},
+    rtweekend::{Color, PI, Point3, Ray, random},
     texture::{SolidColor, Texture},
     vec3::{random_unit_vector, reflect, refract},
 };
@@ -50,11 +50,7 @@ impl Material for Lambertian {
 
     fn scattering_pdf(&self, _r_in: &Ray, rec: &HitRecord, scattered: &Ray) -> f64 {
         let cosine = rec.normal.dot(scattered.dir.unit());
-        if cosine < 0.0 {
-            0.0
-        } else {
-            cosine / PI
-        }
+        if cosine < 0.0 { 0.0 } else { cosine / PI }
     }
 }
 

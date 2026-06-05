@@ -2,7 +2,7 @@ use crate::{
     aabb::Aabb,
     hittable::{HitRecord, Hittable},
     interval::Interval,
-    rtweekend::{random_int, Point3, Ray, Vec3},
+    rtweekend::{Point3, Ray, Vec3, random_int},
 };
 use std::sync::Arc;
 

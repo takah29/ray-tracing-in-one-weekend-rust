@@ -1,4 +1,4 @@
-use crate::rtweekend::{random, random_range, PI};
+use crate::rtweekend::{PI, random, random_range};
 use std::cmp::Ordering;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 

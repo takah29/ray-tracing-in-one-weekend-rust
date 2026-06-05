@@ -3,7 +3,7 @@ use crate::{
     hittable::{HitRecord, Hittable},
     interval::Interval,
     material::{Isotropic, Material},
-    rtweekend::{random, Color, Ray, Vec3, INFINITY},
+    rtweekend::{Color, INFINITY, Ray, Vec3, random},
     texture::Texture,
     vec3,
 };

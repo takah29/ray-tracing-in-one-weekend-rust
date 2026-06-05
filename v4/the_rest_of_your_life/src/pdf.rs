@@ -1,7 +1,7 @@
 use crate::{
     hittable::Hittable,
     onb::Onb,
-    rtweekend::{random, Point3, Vec3, PI},
+    rtweekend::{PI, Point3, Vec3, random},
     vec3::{random_cosine_direction, random_unit_vector},
 };
 
@@ -37,11 +37,7 @@ impl CosinePdf {
 impl Pdf for CosinePdf {
     fn value(&self, direction: &Vec3) -> f64 {
         let cosine = direction.unit().dot(self.uvw.w());
-        if cosine < 0.0 {
-            0.0
-        } else {
-            cosine / PI
-        }
+        if cosine < 0.0 { 0.0 } else { cosine / PI }
     }
 
     fn generate(&self) -> Vec3 {

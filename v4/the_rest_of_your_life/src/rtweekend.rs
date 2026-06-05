@@ -4,8 +4,8 @@ pub use crate::{
 };
 use rand::Rng;
 use std::cell::RefCell;
-pub use std::f64::consts::PI;
 pub use std::f64::INFINITY;
+pub use std::f64::consts::PI;
 
 thread_local! {
     static RNG: RefCell<rand::rngs::ThreadRng> = RefCell::new(rand::thread_rng());
