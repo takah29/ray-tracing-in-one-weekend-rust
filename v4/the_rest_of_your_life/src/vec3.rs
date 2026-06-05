@@ -12,21 +12,21 @@ pub type Color = Vec3;
 
 #[macro_export]
 macro_rules! vec3 {
-    ($x:expr, $y:expr, $z:expr) => {
+    ($x:expr_2021, $y:expr_2021, $z:expr_2021) => {
         Vec3::new($x as f64, $y as f64, $z as f64)
     };
 }
 
 #[macro_export]
 macro_rules! color {
-    ($x:expr, $y:expr, $z:expr) => {
+    ($x:expr_2021, $y:expr_2021, $z:expr_2021) => {
         Color::new($x as f64, $y as f64, $z as f64)
     };
 }
 
 #[macro_export]
 macro_rules! point3 {
-    ($x:expr, $y:expr, $z:expr) => {
+    ($x:expr_2021, $y:expr_2021, $z:expr_2021) => {
         Point3::new($x as f64, $y as f64, $z as f64)
     };
 }

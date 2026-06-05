@@ -12,7 +12,7 @@ thread_local! {
 }
 
 pub fn random() -> f64 {
-    RNG.with(|rng| rng.borrow_mut().gen())
+    RNG.with(|rng| rng.borrow_mut().r#gen())
 }
 
 pub fn random_range(min: f64, max: f64) -> f64 {
